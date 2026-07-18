@@ -1,0 +1,21 @@
+{
+  "name": "pytrain-iphone-pwa",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PyTrain 200-question Python training PWA",
+  "scripts": {
+    "serve": "http-server public -p 8080 -c-1",
+    "check": "python tools/validate_project.py",
+    "cap:add:ios": "cap add ios",
+    "cap:sync": "cap sync ios",
+    "cap:open:ios": "cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/core": "latest",
+    "@capacitor/ios": "latest"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "latest",
+    "http-server": "latest"
+  }
+}
