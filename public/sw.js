@@ -1,4 +1,4 @@
-const CACHE_NAME = "pytrain-pwa-v4";
+const CACHE_NAME = "pytrain-pwa-v5";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -7,6 +7,7 @@ const APP_SHELL = [
   "./data/basic-2.js",
   "./data/practical-1.js",
   "./data/practical-2.js",
+  "./data/scope-fix.js",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
   "./icons/icon-maskable-512.png",
