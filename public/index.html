@@ -12,22 +12,12 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
 <link rel="icon" href="./icons/icon-192.png" sizes="192x192" type="image/png">
-
 <style>
-:root {
-  --bg:#0f172a; --panel:#111827; --panel2:#1f2937; --text:#f8fafc;
-  --muted:#cbd5e1; --accent:#38bdf8; --ok:#22c55e; --ng:#ef4444;
-  --line:#334155;
-}
+:root { --bg:#0f172a; --panel:#111827; --panel2:#1f2937; --text:#f8fafc; --muted:#cbd5e1; --accent:#38bdf8; --ok:#22c55e; --ng:#ef4444; --line:#334155; }
 * { box-sizing:border-box; }
-html, body { min-height:100%; }
-body {
-  margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;
-  background:linear-gradient(180deg,#020617,#0f172a); color:var(--text);
-  min-height:100vh; min-height:100dvh; -webkit-text-size-adjust:100%;
-}
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif; background:linear-gradient(180deg,#020617,#0f172a); color:var(--text); min-height:100vh; -webkit-text-size-adjust:100%; }
 button, select { font:inherit; }
-.wrap { max-width:760px; margin:auto; padding:calc(20px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) calc(40px + env(safe-area-inset-bottom)) calc(14px + env(safe-area-inset-left)); }
+.wrap { max-width:760px; margin:auto; padding:calc(16px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) calc(40px + env(safe-area-inset-bottom)) calc(14px + env(safe-area-inset-left)); }
 header { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:14px; }
 h1 { font-size:22px; margin:0; }
 .badge { font-size:12px; color:#082f49; background:#7dd3fc; padding:5px 9px; border-radius:999px; font-weight:700; }
@@ -36,10 +26,7 @@ h1 { font-size:22px; margin:0; }
 .row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 label { color:var(--muted); font-size:13px; display:grid; gap:6px; }
 select { width:100%; padding:12px; border-radius:12px; border:1px solid var(--line); background:#0b1220; color:var(--text); }
-.primary,.secondary,.choice {
-  width:100%; border:0; border-radius:14px; padding:14px 15px; min-height:50px;
-  cursor:pointer; touch-action:manipulation;
-}
+.primary,.secondary,.choice { width:100%; border:0; border-radius:14px; padding:14px 15px; min-height:50px; cursor:pointer; touch-action:manipulation; }
 .primary { background:var(--accent); color:#082f49; font-weight:800; }
 .secondary { background:#334155; color:var(--text); }
 .choice { background:#1e293b; color:var(--text); border:1px solid #475569; text-align:left; }
@@ -64,246 +51,72 @@ select { width:100%; padding:12px; border-radius:12px; border:1px solid var(--li
 code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; color:#bae6fd; }
 @media (max-width:520px) {
   .row,.actions { grid-template-columns:1fr; }
-  .wrap {
-    padding:calc(20px + env(safe-area-inset-top)) 10px calc(24px + env(safe-area-inset-bottom));
-  }
+  .wrap { padding:calc(20px + env(safe-area-inset-top)) 10px calc(24px + env(safe-area-inset-bottom)); }
   header { margin-bottom:16px; }
   .card { padding:14px; border-radius:15px; }
-  #quiz {
-    min-height:calc(100dvh - 112px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-    display:flex;
-    flex-direction:column;
-  }
+  #quiz { min-height:calc(100dvh - 112px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); display:flex; flex-direction:column; }
   #quiz .choices { margin-top:auto; }
   #quiz .choice { min-height:64px; padding:16px 15px; }
-  #quiz .actions .secondary,
-  #quiz .actions .primary { min-height:58px; }
+  #quiz .actions .secondary, #quiz .actions .primary { min-height:58px; }
 }
 </style>
 </head>
 <body>
 <div class="wrap">
 <header><h1>🚃 PyTrain 検定対策</h1><span class="badge">OFFLINE 400問</span></header>
-
 <section id="menu" class="card grid">
-  <div>
-    <h2 style="margin:0 0 6px;font-size:19px">学習モード</h2>
-    <div class="muted small">基礎200問＋実践200問。端末内だけで動作します。</div>
-  </div>
+  <div><h2 style="margin:0 0 6px;font-size:19px">学習モード</h2><div class="muted small">基礎200問＋実践200問。端末内だけで動作します。</div></div>
   <div class="row">
-    <label>問題レベル
-      <select id="level">
-        <option value="basic">基礎試験クラス（200問）</option>
-        <option value="practical">実践試験クラス（200問）</option>
-        <option value="mixed">混合（400問）</option>
-      </select>
-    </label>
-    <label>出題数
-      <select id="count">
-        <option value="10">10問</option>
-        <option value="20">20問</option>
-        <option value="40">40問</option>
-        <option value="100">100問</option>
-        <option value="200">200問</option>
-        <option value="all">全問</option>
-      </select>
-    </label>
+    <label>問題レベル<select id="level"><option value="basic">基礎試験クラス（200問）</option><option value="practical">実践試験クラス（200問）</option><option value="mixed">混合（400問）</option></select></label>
+    <label>出題数<select id="count"><option value="10">10問</option><option value="20">20問</option><option value="40">40問</option><option value="100">100問</option><option value="200">200問</option><option value="all">全問</option></select></label>
   </div>
-  <label>カテゴリ
-    <select id="category"><option value="all">すべて</option></select>
-  </label>
+  <label>カテゴリ<select id="category"><option value="all">すべて</option></select></label>
   <button id="start" class="primary">問題を開始</button>
   <button id="retryWrong" class="secondary">前回の間違いだけ復習</button>
   <div id="record" class="muted small"></div>
   <div class="notice">※公式試験問題の転載ではありません。公式出題範囲を参考に作成したオリジナル練習問題です。</div>
   <div id="pwaStatus" class="notice">Safariの共有メニューから「ホーム画面に追加」すると、アプリのように起動できます。</div>
 </section>
-
 <section id="quiz" class="card hidden">
   <div class="topline"><span id="meta"></span><span id="score"></span></div>
   <div class="progress"><div id="bar"></div></div>
   <h2 id="question" class="q"></h2>
   <div id="choices" class="choices"></div>
   <div id="explain" class="explain hidden"></div>
-  <div class="actions">
-    <button id="next" class="primary hidden">次の問題</button>
-    <button id="quit" class="secondary">メニューへ戻る</button>
-  </div>
+  <div class="actions"><button id="next" class="primary hidden">次の問題</button><button id="quit" class="secondary">メニューへ戻る</button></div>
 </section>
-
 <section id="result" class="card hidden">
   <h2 style="margin-top:0">結果</h2>
-  <div class="stat">
-    <div><b id="rScore">0</b><span class="small muted">正解</span></div>
-    <div><b id="rRate">0%</b><span class="small muted">正答率</span></div>
-    <div><b id="rWrong">0</b><span class="small muted">間違い</span></div>
-  </div>
+  <div class="stat"><div><b id="rScore">0</b><span class="small muted">正解</span></div><div><b id="rRate">0%</b><span class="small muted">正答率</span></div><div><b id="rWrong">0</b><span class="small muted">間違い</span></div></div>
   <div id="message" class="explain"></div>
-  <div class="actions">
-    <button id="againWrong" class="primary">間違いを復習</button>
-    <button id="back" class="secondary">メニューへ</button>
-  </div>
+  <div class="actions"><button id="againWrong" class="primary">間違いを復習</button><button id="back" class="secondary">メニューへ</button></div>
 </section>
 </div>
-
 <script src="./data/basic-1.js"></script>
 <script src="./data/basic-2.js"></script>
 <script src="./data/practical-1.js"></script>
 <script src="./data/practical-2.js"></script>
+<script src="./data/scope-fix.js"></script>
 <script>
-const DATA = {
-  basic: [...window.PYTRAIN_BASIC_1, ...window.PYTRAIN_BASIC_2],
-  practical: [...window.PYTRAIN_PRACTICAL_1, ...window.PYTRAIN_PRACTICAL_2]
-};
+const DATA = window.PYTRAIN_REBALANCED_DATA;
 const $=id=>document.getElementById(id);
-let pool=[], current=[], index=0, correct=0, wrong=[];
-let answered=false;
-
-function shuffle(a) {
-  a=[...a];
-  for(let i=a.length-1;i>0;i--) {
-    const j=Math.floor(Math.random()*(i+1));
-    [a[i],a[j]]=[a[j],a[i]];
-  }
-  return a;
-}
-function activeBank() {
-  const level=$("level").value;
-  if(level==="basic") return DATA.basic.map((q,i)=>({...q,id:"b"+i,level:"基礎"}));
-  if(level==="practical") return DATA.practical.map((q,i)=>({...q,id:"p"+i,level:"実践"}));
-  return [
-    ...DATA.basic.map((q,i)=>({...q,id:"b"+i,level:"基礎"})),
-    ...DATA.practical.map((q,i)=>({...q,id:"p"+i,level:"実践"}))
-  ];
-}
-function fillCategories() {
-  const selected=$("category").value;
-  const cats=[...new Set(activeBank().map(q=>q.category))].sort();
-  $("category").innerHTML='<option value="all">すべて</option>'+cats.map(c=>`<option value="${c}">${c}</option>`).join("");
-  if(cats.includes(selected)) $("category").value=selected;
-}
-function loadRecord() {
-  const rec=JSON.parse(localStorage.getItem("pytrain_record")||"{}");
-  const attempts=rec.attempts||0, best=rec.best||0;
-  $("record").textContent=`学習回数: ${attempts}回 / 最高正答率: ${best}%`;
-  const hasWrong=(JSON.parse(localStorage.getItem("pytrain_wrong")||"[]")).length>0;
-  $("retryWrong").disabled=!hasWrong;
-  $("retryWrong").style.opacity=hasWrong?"1":".45";
-}
-function show(id) {
-  ["menu","quiz","result"].forEach(x=>$(x).classList.toggle("hidden",x!==id));
-}
-function begin(list) {
-  if(!list.length) { alert("該当する問題がありません。"); return; }
-  current=shuffle(list);
-  index=0; correct=0; wrong=[]; answered=false;
-  show("quiz"); render();
-}
-function startQuiz() {
-  pool=activeBank();
-  const cat=$("category").value;
-  if(cat!=="all") pool=pool.filter(q=>q.category===cat);
-  const n=$("count").value==="all"?pool.length:Math.min(Number($("count").value),pool.length);
-  begin(shuffle(pool).slice(0,n));
-}
-function render() {
-  answered=false;
-  const q=current[index];
-  $("meta").textContent=`${q.level}・${q.category}　${index+1} / ${current.length}`;
-  $("score").textContent=`正解 ${correct}`;
-  $("bar").style.width=`${(index/current.length)*100}%`;
-  $("question").textContent=q.q;
-  $("explain").classList.add("hidden");
-  $("next").classList.add("hidden");
-  $("choices").innerHTML="";
-  q.choices.forEach((c,i)=>{
-    const b=document.createElement("button");
-    b.className="choice";
-    b.textContent=`${"ABCD"[i]}. ${c}`;
-    b.addEventListener("click",()=>answer(i));
-    $("choices").appendChild(b);
-  });
-}
-function answer(choice) {
-  if(answered) return;
-  answered=true;
-  const q=current[index];
-  const buttons=[...$("choices").children];
-  buttons.forEach((b,i)=>{
-    b.disabled=true;
-    if(i===q.answer) b.classList.add("correct");
-    if(i===choice && i!==q.answer) b.classList.add("wrong");
-  });
-  if(choice===q.answer) correct++;
-  else wrong.push(q);
-  $("score").textContent=`正解 ${correct}`;
-  $("explain").innerHTML=`<b>${choice===q.answer?"正解！":"不正解"}</b><br>${q.explanation}`;
-  $("explain").classList.remove("hidden");
-  $("next").textContent=index===current.length-1?"結果を見る":"次の問題";
-  $("next").classList.remove("hidden");
-  $("bar").style.width=`${((index+1)/current.length)*100}%`;
-}
-function next() {
-  if(index<current.length-1) { index++; render(); } else finish();
-}
-function finish() {
-  const rate=Math.round(correct/current.length*100);
-  $("rScore").textContent=`${correct} / ${current.length}`;
-  $("rRate").textContent=rate+"%";
-  $("rWrong").textContent=wrong.length;
-  $("message").textContent=rate>=90?"かなり仕上がっています。弱点カテゴリだけ復習しましょう。":
-    rate>=70?"合格圏です。間違えた問題を復習すると安定します。":
-    "まだ伸びしろがあります。解説を確認して再挑戦しましょう。";
-  localStorage.setItem("pytrain_wrong",JSON.stringify(wrong));
-  const rec=JSON.parse(localStorage.getItem("pytrain_record")||"{}");
-  rec.attempts=(rec.attempts||0)+1;
-  rec.best=Math.max(rec.best||0,rate);
-  localStorage.setItem("pytrain_record",JSON.stringify(rec));
-  $("againWrong").disabled=wrong.length===0;
-  $("againWrong").style.opacity=wrong.length?"1":".45";
-  show("result"); loadRecord();
-}
-function confirmQuit() {
-  const message="メニューに戻ると、現在の解答状況は保存されません。\nメニューに戻りますか？";
-  if(!window.confirm(message)) return;
-  show("menu");
-  loadRecord();
-}
-
-$("level").addEventListener("change",fillCategories);
-$("start").addEventListener("click",startQuiz);
-$("next").addEventListener("click",next);
-$("quit").addEventListener("click",confirmQuit);
-$("back").addEventListener("click",()=>{show("menu");loadRecord();});
-$("retryWrong").addEventListener("click",()=>{
-  const saved=JSON.parse(localStorage.getItem("pytrain_wrong")||"[]");
-  begin(saved);
-});
-$("againWrong").addEventListener("click",()=>begin(wrong));
-fillCategories(); loadRecord();
+let pool=[],current=[],index=0,correct=0,wrong=[],answered=false;
+function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function activeBank(){const level=$("level").value;if(level==="basic")return DATA.basic.map((q,i)=>({...q,id:"b"+i,level:"基礎"}));if(level==="practical")return DATA.practical.map((q,i)=>({...q,id:"p"+i,level:"実践"}));return[...DATA.basic.map((q,i)=>({...q,id:"b"+i,level:"基礎"})),...DATA.practical.map((q,i)=>({...q,id:"p"+i,level:"実践"}))];}
+function fillCategories(){const selected=$("category").value;const cats=[...new Set(activeBank().map(q=>q.category))].sort();$("category").innerHTML='<option value="all">すべて</option>'+cats.map(c=>`<option value="${c}">${c}</option>`).join("");if(cats.includes(selected))$("category").value=selected;}
+function loadRecord(){const rec=JSON.parse(localStorage.getItem("pytrain_record")||"{}");$("record").textContent=`学習回数: ${rec.attempts||0}回 / 最高正答率: ${rec.best||0}%`;const hasWrong=JSON.parse(localStorage.getItem("pytrain_wrong")||"[]").length>0;$("retryWrong").disabled=!hasWrong;$("retryWrong").style.opacity=hasWrong?"1":".45";}
+function show(id){["menu","quiz","result"].forEach(x=>$(x).classList.toggle("hidden",x!==id));}
+function begin(list){if(!list.length){alert("該当する問題がありません。");return;}current=shuffle(list);index=0;correct=0;wrong=[];answered=false;show("quiz");render();}
+function startQuiz(){pool=activeBank();const cat=$("category").value;if(cat!=="all")pool=pool.filter(q=>q.category===cat);const n=$("count").value==="all"?pool.length:Math.min(Number($("count").value),pool.length);begin(shuffle(pool).slice(0,n));}
+function render(){answered=false;const q=current[index];$("meta").textContent=`${q.level}・${q.category}　${index+1} / ${current.length}`;$("score").textContent=`正解 ${correct}`;$("bar").style.width=`${index/current.length*100}%`;$("question").textContent=q.q;$("explain").classList.add("hidden");$("next").classList.add("hidden");$("choices").innerHTML="";q.choices.forEach((c,i)=>{const b=document.createElement("button");b.className="choice";b.textContent=`${"ABCD"[i]}. ${c}`;b.addEventListener("click",()=>answer(i));$("choices").appendChild(b);});}
+function answer(choice){if(answered)return;answered=true;const q=current[index];[...$("choices").children].forEach((b,i)=>{b.disabled=true;if(i===q.answer)b.classList.add("correct");if(i===choice&&i!==q.answer)b.classList.add("wrong");});if(choice===q.answer)correct++;else wrong.push(q);$("score").textContent=`正解 ${correct}`;$("explain").innerHTML=`<b>${choice===q.answer?"正解！":"不正解"}</b><br>${q.explanation}`;$("explain").classList.remove("hidden");$("next").textContent=index===current.length-1?"結果を見る":"次の問題";$("next").classList.remove("hidden");$("bar").style.width=`${(index+1)/current.length*100}%`;}
+function next(){if(index<current.length-1){index++;render();}else finish();}
+function finish(){const rate=Math.round(correct/current.length*100);$("rScore").textContent=`${correct} / ${current.length}`;$("rRate").textContent=rate+"%";$("rWrong").textContent=wrong.length;$("message").textContent=rate>=90?"かなり仕上がっています。弱点カテゴリだけ復習しましょう。":rate>=70?"合格圏です。間違えた問題を復習すると安定します。":"まだ伸びしろがあります。解説を確認して再挑戦しましょう。";localStorage.setItem("pytrain_wrong",JSON.stringify(wrong));const rec=JSON.parse(localStorage.getItem("pytrain_record")||"{}");rec.attempts=(rec.attempts||0)+1;rec.best=Math.max(rec.best||0,rate);localStorage.setItem("pytrain_record",JSON.stringify(rec));$("againWrong").disabled=wrong.length===0;$("againWrong").style.opacity=wrong.length?"1":".45";show("result");loadRecord();}
+function confirmQuit(){if(!window.confirm("メニューに戻ると、現在の解答状況は保存されません。\nメニューに戻りますか？"))return;show("menu");loadRecord();}
+$("level").addEventListener("change",fillCategories);$("start").addEventListener("click",startQuiz);$("next").addEventListener("click",next);$("quit").addEventListener("click",confirmQuit);$("back").addEventListener("click",()=>{show("menu");loadRecord();});$("retryWrong").addEventListener("click",()=>begin(JSON.parse(localStorage.getItem("pytrain_wrong")||"[]")));$("againWrong").addEventListener("click",()=>begin(wrong));fillCategories();loadRecord();
 </script>
-
 <script>
-(function () {
-  const status = document.getElementById("pwaStatus");
-  const standalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
-  if (standalone && status) {
-    status.textContent = "ホーム画面アプリとして起動中です。学習データはこの端末内に保存されます。";
-  }
-
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", async () => {
-      try {
-        await navigator.serviceWorker.register("./sw.js", { scope: "./" });
-      } catch (error) {
-        console.warn("Service Worker registration failed:", error);
-        if (status && location.protocol !== "file:") {
-          status.textContent = "オフライン準備に失敗しました。HTTPSで公開されているか確認してください。";
-        }
-      }
-    });
-  }
-})();
+(function(){const status=document.getElementById("pwaStatus");const standalone=window.matchMedia("(display-mode: standalone)").matches||window.navigator.standalone===true;if(standalone&&status)status.textContent="ホーム画面アプリとして起動中です。学習データはこの端末内に保存されます。";if("serviceWorker" in navigator)window.addEventListener("load",async()=>{try{await navigator.serviceWorker.register("./sw.js",{scope:"./"});}catch(error){console.warn("Service Worker registration failed:",error);if(status&&location.protocol!=="file:")status.textContent="オフライン準備に失敗しました。HTTPSで公開されているか確認してください。";}});})();
 </script>
 </body>
 </html>
