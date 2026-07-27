@@ -1,4 +1,4 @@
-const CACHE_NAME = "pytrain-pwa-v5";
+const CACHE_NAME = "pytrain-pwa-v6";
 const APP_SHELL = [
   "./",
   "./index.html",
