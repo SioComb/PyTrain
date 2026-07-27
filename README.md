@@ -1,6 +1,6 @@
 # PyTrain iPhone PWA 開発環境
 
-前回作成した **Python検定対策200問（基礎100問＋実践100問）** を、iPhoneのホーム画面から起動できるPWAへ変換した開発環境です。
+**Python検定対策400問（基礎200問＋実践200問）** を、iPhoneのホーム画面から起動できるPWAとして提供する開発環境です。
 
 ## まずPCで起動
 
@@ -16,13 +16,18 @@ Python以外の追加インストールは不要です。
 ```text
 PyTrain-iPhone-PWA/
 ├─ public/
-│  ├─ index.html                アプリ本体・200問入り
+│  ├─ index.html                アプリ本体
+│  ├─ data/
+│  │  ├─ basic-1.js             基礎問題 1〜100
+│  │  ├─ basic-2.js             基礎問題 101〜200
+│  │  ├─ practical-1.js         実践問題 1〜100
+│  │  └─ practical-2.js         実践問題 101〜200
 │  ├─ manifest.webmanifest      PWA設定
 │  ├─ sw.js                     オフラインキャッシュ
 │  └─ icons/                    iPhone/PWAアイコン
 ├─ tools/
 │  ├─ dev_server.py             開発用サーバー
-│  └─ validate_project.py       問題数・PWA構成の検証
+│  └─ validate_project.py       問題数・構造・PWA構成の検証
 ├─ .github/workflows/pages.yml  GitHub Pages自動公開
 ├─ capacitor.config.json        App Store版へ進む際の設定
 ├─ package.json                 Node/Capacitor用（任意）
@@ -30,33 +35,34 @@ PyTrain-iPhone-PWA/
 └─ validate.bat
 ```
 
+## 主な変更点
+
+- 基礎試験クラスを100問から200問へ拡張
+- 実践試験クラスを100問から200問へ拡張
+- `pip`、仮想環境、`pyproject.toml`、`uv`、Ruff、Black、Flake8、型検査などの問題を追加
+- 問題データを4ファイルへ分離し、今後追加しやすい構造へ変更
+- 「メニューへ戻る」を押したとき、解答中の記録が保存されない旨を確認するダイアログを追加
+- 各レベルで正答位置A〜Dを50問ずつに均等化
+- 問題文の重複、選択肢重複、問題数、PWAキャッシュ対象を検証スクリプトで確認
+
 ## iPhoneへ入れる推奨手順
 
 ローカルのHTMLファイルを直接開くのではなく、GitHub Pagesなどの **HTTPS** 環境へ公開します。
 
 ### GitHub Pagesで公開
 
-1. GitHubで空のリポジトリを作成します。
-2. このフォルダの中身をリポジトリへアップロードします。
-3. リポジトリの `Settings` → `Pages` を開きます。
-4. `Build and deployment` のSourceを **GitHub Actions** にします。
-5. `main` ブランチへ反映すると、同梱のWorkflowが `public` フォルダを公開します。
-6. 公開URLをiPhoneのSafariで開きます。
-7. Safariの共有ボタン → **ホーム画面に追加** を選びます。
-8. 一度起動して問題画面を表示した後は、キャッシュ済みの内容をオフラインで利用できます。
+1. リポジトリの `Settings` → `Pages` を開きます。
+2. `Build and deployment` のSourceを **GitHub Actions** にします。
+3. `main` ブランチへ反映すると、同梱のWorkflowが `public` フォルダを公開します。
+4. 公開URLをiPhoneのSafariで開きます。
+5. Safariの共有ボタン → **ホーム画面に追加** を選びます。
+6. 一度起動した後は、キャッシュ済みの内容をオフラインで利用できます。
 
-更新後に古い画面が残る場合は、Safariで再読み込みするか、ホーム画面のアイコンを削除して再追加してください。Service Workerを更新した場合は `public/sw.js` の `CACHE_NAME` を変更すると確実です。
+更新後に古い画面が残る場合は、Safariで再読み込みしてください。今回はService Workerのキャッシュ名を `pytrain-pwa-v2` へ更新しています。
 
 ## 問題を編集する場所
 
-`public/index.html` 内の次の部分に全問題が入っています。
-
-```javascript
-const DATA = {
-  "basic": [...],
-  "practical": [...]
-};
-```
+問題データは `public/data/*.js` に分割しています。各ファイルは100問です。
 
 各問題は以下の形式です。
 
@@ -72,7 +78,15 @@ const DATA = {
 
 `answer` は0始まりです。A=0、B=1、C=2、D=3です。
 
-編集後は `validate.bat` を実行してください。基礎100問・実践100問、選択肢数、PWAファイルを確認します。
+編集後は `validate.bat` を実行してください。以下を確認します。
+
+- 基礎200問・実践200問
+- 各データファイル100問
+- 必須項目と選択肢数
+- 問題文・選択肢の重複
+- 正答位置の均等性
+- 離脱確認ダイアログ
+- PWA必須ファイルとオフラインキャッシュ
 
 ## App Store版へ進む場合（Mac必須）
 
@@ -89,4 +103,4 @@ npm run cap:open:ios
 
 ## データ保存
 
-正答履歴・最高正答率・前回の間違いはブラウザの`localStorage`へ保存されます。SafariのWebサイトデータを削除した場合やホーム画面アプリを削除した場合、履歴が消えることがあります。
+正答履歴・最高正答率・前回の間違いはブラウザの`localStorage`へ保存されます。クイズの途中で「メニューへ戻る」を選んだ場合、その回の途中経過は保存されません。

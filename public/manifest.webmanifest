@@ -2,7 +2,7 @@
   "id": "./",
   "name": "PyTrain Python検定対策",
   "short_name": "PyTrain",
-  "description": "基礎100問＋実践100問をオフラインで学べるPythonクイズアプリ",
+  "description": "基礎200問＋実践200問をオフラインで学べるPythonクイズアプリ",
   "lang": "ja",
   "start_url": "./",
   "scope": "./",
