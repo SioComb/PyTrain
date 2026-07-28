@@ -18,4 +18,15 @@
   }
 
   window.PYTRAIN_REBALANCED_DATA = { basic, practical };
+
+  // メニュー画面のランク要素IDを、共通のランク描画処理が参照する形式へ統一する。
+  const rankIdMap = {
+    rankSymbol: "RankSymbol",
+    rankTitle: "RankTitle",
+    rankDetail: "RankDetail",
+  };
+  Object.entries(rankIdMap).forEach(([currentId, expectedId]) => {
+    const element = document.getElementById(currentId);
+    if (element) element.id = expectedId;
+  });
 })();
