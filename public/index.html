@@ -46,6 +46,10 @@ select { width:100%; padding:12px; border-radius:12px; border:1px solid var(--li
 .stat { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:14px 0; }
 .stat div { background:#0b1220; border:1px solid var(--line); border-radius:12px; padding:12px 6px; text-align:center; }
 .stat b { font-size:21px; display:block; }
+.rank-card { display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:center; padding:13px; border:1px solid #475569; border-radius:14px; background:linear-gradient(135deg,rgba(56,189,248,.16),rgba(15,23,42,.65)); }
+.rank-symbol { min-width:58px; text-align:center; font-size:30px; line-height:1; font-weight:900; color:#7dd3fc; }
+.rank-title { font-weight:800; }
+.rank-detail { margin-top:4px; }
 .small { font-size:12px; }
 .notice { margin-top:12px; font-size:12px; line-height:1.5; color:#94a3b8; }
 code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; color:#bae6fd; }
@@ -66,6 +70,10 @@ code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; color:#bae6fd; }
 <header><h1>🚃 PyTrain 検定対策</h1><span class="badge">OFFLINE 400問</span></header>
 <section id="menu" class="card grid">
   <div><h2 style="margin:0 0 6px;font-size:19px">学習モード</h2><div class="muted small">基礎183問＋実践217問。端末内だけで動作します。</div></div>
+  <div id="rankCard" class="rank-card">
+    <div id="rankSymbol" class="rank-symbol">-</div>
+    <div><div id="rankTitle" class="rank-title">未判定</div><div id="rankDetail" class="rank-detail muted small">問題を解くと総合評価が記録されます。</div></div>
+  </div>
   <div class="row">
     <label>問題レベル<select id="level"><option value="basic">基礎試験クラス（183問）</option><option value="practical">実践試験クラス（217問）</option><option value="mixed">混合（400問）</option></select></label>
     <label>出題数<select id="count"><option value="10">10問</option><option value="20">20問</option><option value="40">40問</option><option value="100">100問</option><option value="200">200問</option><option value="all">全問</option></select></label>
@@ -88,6 +96,7 @@ code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; color:#bae6fd; }
 <section id="result" class="card hidden">
   <h2 style="margin-top:0">結果</h2>
   <div class="stat"><div><b id="rScore">0</b><span class="small muted">正解</span></div><div><b id="rRate">0%</b><span class="small muted">正答率</span></div><div><b id="rWrong">0</b><span class="small muted">間違い</span></div></div>
+  <div id="resultRank" class="rank-card"><div id="resultRankSymbol" class="rank-symbol">-</div><div><div id="resultRankTitle" class="rank-title">未判定</div><div id="resultRankDetail" class="rank-detail muted small"></div></div></div>
   <div id="message" class="explain"></div>
   <div class="actions"><button id="againWrong" class="primary">間違いを復習</button><button id="back" class="secondary">メニューへ</button></div>
 </section>
@@ -101,17 +110,27 @@ code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; color:#bae6fd; }
 const DATA = window.PYTRAIN_REBALANCED_DATA;
 const $=id=>document.getElementById(id);
 let pool=[],current=[],index=0,correct=0,wrong=[],answered=false;
+const RANKS=[
+  {min:100,rank:"SSS",title:"蛇神"},{min:95,rank:"SS",title:"Pythonマスター"},{min:90,rank:"S",title:"言語仕様の理解者"},
+  {min:80,rank:"A",title:"Python実務者"},{min:70,rank:"B+",title:"合格圏内"},{min:60,rank:"B",title:"実務見習い"},
+  {min:50,rank:"C+",title:"基礎修行中"},{min:40,rank:"C",title:"初級Pythonista"},{min:30,rank:"D",title:"駆け出しPython使い"},
+  {min:20,rank:"E",title:"見習いコーダー"},{min:0,rank:"F",title:"無知の探索者"}
+];
 function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function rankFor(score){return RANKS.find(item=>score>=item.min);}
+function nextRankFor(score){return [...RANKS].reverse().find(item=>item.min>score);}
+function overallScore(rec){if((rec.totalQuestions||0)>0)return Math.round(rec.totalCorrect/rec.totalQuestions*100);return rec.attempts?rec.best||0:null;}
+function renderRank(score,prefix=""){const symbol=$(prefix+"RankSymbol"),title=$(prefix+"RankTitle"),detail=$(prefix+"RankDetail");if(score===null){symbol.textContent="-";title.textContent="未判定";detail.textContent="問題を解くと総合評価が記録されます。";return;}const rank=rankFor(score);const next=nextRankFor(score);symbol.textContent=rank.rank;title.textContent=`${rank.title}（総合評価 ${score}点）`;detail.textContent=next?`次のランク ${next.rank} まであと ${next.min-score}点`:`最高ランク到達`;}
 function activeBank(){const level=$("level").value;if(level==="basic")return DATA.basic.map((q,i)=>({...q,id:"b"+i,level:"基礎"}));if(level==="practical")return DATA.practical.map((q,i)=>({...q,id:"p"+i,level:"実践"}));return[...DATA.basic.map((q,i)=>({...q,id:"b"+i,level:"基礎"})),...DATA.practical.map((q,i)=>({...q,id:"p"+i,level:"実践"}))];}
 function fillCategories(){const selected=$("category").value;const cats=[...new Set(activeBank().map(q=>q.category))].sort();$("category").innerHTML='<option value="all">すべて</option>'+cats.map(c=>`<option value="${c}">${c}</option>`).join("");if(cats.includes(selected))$("category").value=selected;}
-function loadRecord(){const rec=JSON.parse(localStorage.getItem("pytrain_record")||"{}");$("record").textContent=`学習回数: ${rec.attempts||0}回 / 最高正答率: ${rec.best||0}%`;const hasWrong=JSON.parse(localStorage.getItem("pytrain_wrong")||"[]").length>0;$("retryWrong").disabled=!hasWrong;$("retryWrong").style.opacity=hasWrong?"1":".45";}
+function loadRecord(){const rec=JSON.parse(localStorage.getItem("pytrain_record")||"{}");const score=overallScore(rec);renderRank(score);$("record").textContent=`学習回数: ${rec.attempts||0}回 / 最高正答率: ${rec.best||0}%${(rec.totalQuestions||0)>0?` / 累計: ${rec.totalCorrect}問正解・${rec.totalQuestions}問解答`:""}`;const hasWrong=JSON.parse(localStorage.getItem("pytrain_wrong")||"[]").length>0;$("retryWrong").disabled=!hasWrong;$("retryWrong").style.opacity=hasWrong?"1":".45";}
 function show(id){["menu","quiz","result"].forEach(x=>$(x).classList.toggle("hidden",x!==id));}
 function begin(list){if(!list.length){alert("該当する問題がありません。");return;}current=shuffle(list);index=0;correct=0;wrong=[];answered=false;show("quiz");render();}
 function startQuiz(){pool=activeBank();const cat=$("category").value;if(cat!=="all")pool=pool.filter(q=>q.category===cat);const n=$("count").value==="all"?pool.length:Math.min(Number($("count").value),pool.length);begin(shuffle(pool).slice(0,n));}
 function render(){answered=false;const q=current[index];$("meta").textContent=`${q.level}・${q.category}　${index+1} / ${current.length}`;$("score").textContent=`正解 ${correct}`;$("bar").style.width=`${index/current.length*100}%`;$("question").textContent=q.q;$("explain").classList.add("hidden");$("next").classList.add("hidden");$("choices").innerHTML="";q.choices.forEach((c,i)=>{const b=document.createElement("button");b.className="choice";b.textContent=`${"ABCD"[i]}. ${c}`;b.addEventListener("click",()=>answer(i));$("choices").appendChild(b);});}
 function answer(choice){if(answered)return;answered=true;const q=current[index];[...$("choices").children].forEach((b,i)=>{b.disabled=true;if(i===q.answer)b.classList.add("correct");if(i===choice&&i!==q.answer)b.classList.add("wrong");});if(choice===q.answer)correct++;else wrong.push(q);$("score").textContent=`正解 ${correct}`;$("explain").innerHTML=`<b>${choice===q.answer?"正解！":"不正解"}</b><br>${q.explanation}`;$("explain").classList.remove("hidden");$("next").textContent=index===current.length-1?"結果を見る":"次の問題";$("next").classList.remove("hidden");$("bar").style.width=`${(index+1)/current.length*100}%`;}
 function next(){if(index<current.length-1){index++;render();}else finish();}
-function finish(){const rate=Math.round(correct/current.length*100);$("rScore").textContent=`${correct} / ${current.length}`;$("rRate").textContent=rate+"%";$("rWrong").textContent=wrong.length;$("message").textContent=rate>=90?"かなり仕上がっています。弱点カテゴリだけ復習しましょう。":rate>=70?"合格圏です。間違えた問題を復習すると安定します。":"まだ伸びしろがあります。解説を確認して再挑戦しましょう。";localStorage.setItem("pytrain_wrong",JSON.stringify(wrong));const rec=JSON.parse(localStorage.getItem("pytrain_record")||"{}");rec.attempts=(rec.attempts||0)+1;rec.best=Math.max(rec.best||0,rate);localStorage.setItem("pytrain_record",JSON.stringify(rec));$("againWrong").disabled=wrong.length===0;$("againWrong").style.opacity=wrong.length?"1":".45";show("result");loadRecord();}
+function finish(){const rate=Math.round(correct/current.length*100);$("rScore").textContent=`${correct} / ${current.length}`;$("rRate").textContent=rate+"%";$("rWrong").textContent=wrong.length;$("message").textContent=rate>=90?"かなり仕上がっています。弱点カテゴリだけ復習しましょう。":rate>=70?"合格圏です。間違えた問題を復習すると安定します。":"まだ伸びしろがあります。解説を確認して再挑戦しましょう。";localStorage.setItem("pytrain_wrong",JSON.stringify(wrong));const rec=JSON.parse(localStorage.getItem("pytrain_record")||"{}");rec.attempts=(rec.attempts||0)+1;rec.best=Math.max(rec.best||0,rate);rec.totalCorrect=(rec.totalCorrect||0)+correct;rec.totalQuestions=(rec.totalQuestions||0)+current.length;localStorage.setItem("pytrain_record",JSON.stringify(rec));renderRank(overallScore(rec),"result");$("againWrong").disabled=wrong.length===0;$("againWrong").style.opacity=wrong.length?"1":".45";show("result");loadRecord();}
 function confirmQuit(){if(!window.confirm("メニューに戻ると、現在の解答状況は保存されません。\nメニューに戻りますか？"))return;show("menu");loadRecord();}
 $("level").addEventListener("change",fillCategories);$("start").addEventListener("click",startQuiz);$("next").addEventListener("click",next);$("quit").addEventListener("click",confirmQuit);$("back").addEventListener("click",()=>{show("menu");loadRecord();});$("retryWrong").addEventListener("click",()=>begin(JSON.parse(localStorage.getItem("pytrain_wrong")||"[]")));$("againWrong").addEventListener("click",()=>begin(wrong));fillCategories();loadRecord();
 </script>
