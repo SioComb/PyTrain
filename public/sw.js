@@ -1,4 +1,4 @@
-const CACHE_NAME = "pytrain-pwa-v9";
+const CACHE_NAME = "pytrain-pwa-v10";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -14,47 +14,120 @@ const APP_SHELL = [
   "./icons/apple-touch-icon.png"
 ];
 
+function repairIndexHtml(html) {
+  return html
+    .replace('id="rankSymbol"', 'id="RankSymbol"')
+    .replace('id="rankTitle"', 'id="RankTitle"')
+    .replace('id="rankDetail"', 'id="RankDetail"');
+}
+
+async function fetchFresh(request) {
+  return fetch(request, { cache: "no-store" });
+}
+
+async function cacheFreshAsset(cache, url) {
+  const response = await fetchFresh(url);
+  if (!response.ok) throw new Error(`Precache failed: ${url} (${response.status})`);
+
+  if (url === "./" || url === "./index.html") {
+    const html = repairIndexHtml(await response.text());
+    const headers = new Headers(response.headers);
+    headers.delete("content-length");
+    await cache.put(url, new Response(html, {
+      status: response.status,
+      statusText: response.statusText,
+      headers
+    }));
+    return;
+  }
+
+  await cache.put(url, response);
+}
+
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(APP_SHELL))
+      .then((cache) => Promise.all(APP_SHELL.map((url) => cacheFreshAsset(cache, url))))
       .then(() => self.skipWaiting())
   );
 });
 
 self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    caches.keys()
-      .then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))))
-      .then(() => self.clients.claim())
-  );
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key)));
+    await self.clients.claim();
+
+    // 既に開いているホーム画面版も、新Service Workerの有効化時に再読込する。
+    const clients = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+    await Promise.all(clients.map(async (client) => {
+      if (typeof client.navigate !== "function") return;
+      try {
+        await client.navigate(client.url);
+      } catch (error) {
+        console.warn("PyTrain client reload failed:", error);
+      }
+    }));
+  })());
 });
 
-self.addEventListener("fetch", (event) => {
-  if (event.request.method !== "GET") return;
+async function networkFirstIndex(request) {
+  try {
+    const response = await fetchFresh(request);
+    if (!response.ok) throw new Error(`Navigation failed: ${response.status}`);
 
-  if (event.request.mode === "navigate") {
-    event.respondWith(
-      fetch(event.request)
-        .then((response) => {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put("./index.html", copy));
-          return response;
-        })
-        .catch(() => caches.match("./index.html"))
-    );
+    const html = repairIndexHtml(await response.text());
+    const headers = new Headers(response.headers);
+    headers.delete("content-length");
+    const repaired = new Response(html, {
+      status: response.status,
+      statusText: response.statusText,
+      headers
+    });
+
+    const cache = await caches.open(CACHE_NAME);
+    await cache.put("./index.html", repaired.clone());
+    await cache.put("./", repaired.clone());
+    return repaired;
+  } catch (error) {
+    return (await caches.match("./index.html")) || (await caches.match("./")) || Response.error();
+  }
+}
+
+async function networkFirstAsset(request) {
+  try {
+    const response = await fetchFresh(request);
+    if (!response || response.status !== 200 || response.type === "opaque") return response;
+    const cache = await caches.open(CACHE_NAME);
+    await cache.put(request, response.clone());
+    return response;
+  } catch (error) {
+    return (await caches.match(request)) || Response.error();
+  }
+}
+
+async function cacheFirstImage(request) {
+  const cached = await caches.match(request);
+  if (cached) return cached;
+  return networkFirstAsset(request);
+}
+
+self.addEventListener("fetch", (event) => {
+  const { request } = event;
+  if (request.method !== "GET") return;
+
+  if (request.mode === "navigate") {
+    event.respondWith(networkFirstIndex(request));
     return;
   }
 
-  event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) return cached;
-      return fetch(event.request).then((response) => {
-        if (!response || response.status !== 200 || response.type === "opaque") return response;
-        const copy = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
-        return response;
-      });
-    })
-  );
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
+
+  // JavaScript・manifest等はネットワーク優先。画像のみキャッシュ優先にする。
+  if (request.destination === "image") {
+    event.respondWith(cacheFirstImage(request));
+  } else {
+    event.respondWith(networkFirstAsset(request));
+  }
 });
