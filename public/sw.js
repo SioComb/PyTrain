@@ -1,4 +1,4 @@
-const CACHE_NAME = "pytrain-pwa-v11";
+const CACHE_NAME = "pytrain-pwa-v12";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -25,7 +25,7 @@ function repairIndexHtml(html) {
     )
     .replace(
       "ホーム画面アプリとして起動中です。",
-      "ホーム画面アプリとして起動中です（v11）。"
+      "ホーム画面アプリとして起動中です（v12）。"
     );
 }
 
