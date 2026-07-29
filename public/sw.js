@@ -1,4 +1,4 @@
-const CACHE_NAME = "pytrain-pwa-v13";
+const CACHE_NAME = "pytrain-pwa-v14";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -25,7 +25,7 @@ function repairIndexHtml(html) {
     )
     .replace(
       "ホーム画面アプリとして起動中です。",
-      "ホーム画面アプリとして起動中です（v13）。"
+      "ホーム画面アプリとして起動中です（v14）。"
     );
 }
 
@@ -66,7 +66,6 @@ self.addEventListener("activate", (event) => {
     await Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key)));
     await self.clients.claim();
 
-    // 既に開いているホーム画面版も、新Service Workerの有効化時に再読込する。
     const clients = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
     await Promise.all(clients.map(async (client) => {
       if (typeof client.navigate !== "function") return;
@@ -132,7 +131,6 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  // JavaScript・manifest等はネットワーク優先。画像のみキャッシュ優先にする。
   if (request.destination === "image") {
     event.respondWith(cacheFirstImage(request));
   } else {
