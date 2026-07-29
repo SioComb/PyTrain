@@ -17,28 +17,24 @@
   ];
 
   const CHAPTERS = [
-    ["01","Chapter 1　Pythonの環境"],
-    ["02","Chapter 2　コーディング規約"],
-    ["03","Chapter 3　Pythonの言語仕様"],
-    ["04","Chapter 4　Pythonのクラス"],
-    ["05","Chapter 5　型ヒント"],
-    ["06","Chapter 6　テキストの処理"],
-    ["07","Chapter 7　数値の処理"],
-    ["08","Chapter 8　日付と時刻の処理"],
-    ["09","Chapter 9　データ型とアルゴリズム"],
-    ["10","Chapter 10　汎用OS・ランタイムサービス"],
-    ["11","Chapter 11　ファイルとディレクトリへのアクセス"],
-    ["12","Chapter 12　データ圧縮、アーカイブと永続化"],
-    ["13","Chapter 13　特定のデータフォーマットを扱う"],
-    ["14","Chapter 14　インターネット上のデータを扱う"],
-    ["15","Chapter 15　HTML/XMLを扱う"],
-    ["16","Chapter 16　テスト"],
-    ["17","Chapter 17　デバッグ"],
-    ["18","Chapter 18　暗号関連"],
-    ["19","Chapter 19　並行処理、並列処理"],
+    ["01","Chapter 1　Pythonの環境"],["02","Chapter 2　コーディング規約"],["03","Chapter 3　Pythonの言語仕様"],
+    ["04","Chapter 4　Pythonのクラス"],["05","Chapter 5　型ヒント"],["06","Chapter 6　テキストの処理"],
+    ["07","Chapter 7　数値の処理"],["08","Chapter 8　日付と時刻の処理"],["09","Chapter 9　データ型とアルゴリズム"],
+    ["10","Chapter 10　汎用OS・ランタイムサービス"],["11","Chapter 11　ファイルとディレクトリへのアクセス"],
+    ["12","Chapter 12　データ圧縮、アーカイブと永続化"],["13","Chapter 13　特定のデータフォーマットを扱う"],
+    ["14","Chapter 14　インターネット上のデータを扱う"],["15","Chapter 15　HTML/XMLを扱う"],["16","Chapter 16　テスト"],
+    ["17","Chapter 17　デバッグ"],["18","Chapter 18　暗号関連"],["19","Chapter 19　並行処理、並列処理"],
+  ];
+  const CHAPTER4_SECTIONS = [
+    ["4.1","4.1　class構文"],
+    ["4.2","4.2　属性とメソッド"],
+    ["4.3","4.3　継承"],
+    ["4.4","4.4　dataclass"],
+    ["4.5","4.5　オブジェクト関連関数"],
   ];
 
   const chapterLabel = Object.fromEntries(CHAPTERS);
+  const chapter4Label = Object.fromEntries(CHAPTER4_SECTIONS);
   const includesAny = (text, words) => words.some((word) => text.includes(word));
 
   function inferChapter(question) {
@@ -64,14 +60,25 @@
     return "03";
   }
 
+  function inferChapter4Section(question) {
+    const text = `${question.category || ""} ${question.q || ""} ${question.explanation || ""}`.toLowerCase();
+    if (includesAny(text,["id(","type(","isinstance","issubclass","help(","dir(","weakref","オブジェクトの識別","組み込み関数"])) return "4.5";
+    if (includesAny(text,["dataclass","namedtuple","default_factory","frozen=","field("])) return "4.4";
+    if (includesAny(text,["継承","super(","mro","サブクラス","基底クラス","親クラス","子クラス","parent","child("])) return "4.3";
+    if (includesAny(text,["属性","メソッド","__getattr__","__getattribute__","__setattr__","__getitem__","__setitem__","__len__","__bool__","__eq__","__hash__","classmethod","staticmethod","property","self."])) return "4.2";
+    return "4.1";
+  }
+
   const originalBasic = [...window.PYTRAIN_BASIC_1, ...window.PYTRAIN_BASIC_2];
   const originalPractical = [...window.PYTRAIN_PRACTICAL_1, ...window.PYTRAIN_PRACTICAL_2];
   const movedToPractical = originalBasic.filter((question) => moveFromBasicCategories.has(question.category));
   if (movedToPractical.length !== 17) throw new Error(`PyTrain scope move failed: basic→practical=${movedToPractical.length}`);
 
   const basic = originalBasic.filter((question) => !moveFromBasicCategories.has(question.category));
-  const practical = [...originalPractical, ...movedToPractical, ...objectInspectionQuestions]
-    .map((question) => ({...question, chapter: inferChapter(question)}));
+  const practical = [...originalPractical, ...movedToPractical, ...objectInspectionQuestions].map((question) => {
+    const chapter = inferChapter(question);
+    return {...question, chapter, recipeSection: chapter === "04" ? inferChapter4Section(question) : null};
+  });
   if (basic.length !== 183 || practical.length !== 229) throw new Error(`PyTrain question count failed: basic=${basic.length}, practical=${practical.length}`);
   window.PYTRAIN_REBALANCED_DATA = { basic, practical };
   window.PYTRAIN_CHAPTERS = CHAPTERS.map(([value,label]) => ({value,label}));
@@ -100,21 +107,24 @@
   });
 
   document.addEventListener("DOMContentLoaded", () => {
-    const categoryLabel = document.getElementById("category")?.closest("label");
-    if (!categoryLabel || document.getElementById("chapter")) return;
+    const categoryLabelElement = document.getElementById("category")?.closest("label");
+    if (!categoryLabelElement || document.getElementById("chapter")) return;
 
     const chapterLabelElement = document.createElement("label");
     chapterLabelElement.id = "chapterFilter";
     chapterLabelElement.innerHTML = `Python実践レシピの章<select id="chapter"><option value="all">すべてのChapter</option>${CHAPTERS.map(([value,label]) => `<option value="${value}">${label}</option>`).join("")}</select>`;
-    categoryLabel.before(chapterLabelElement);
+    categoryLabelElement.before(chapterLabelElement);
 
     const chapter = document.getElementById("chapter");
     const category = document.getElementById("category");
     const start = document.getElementById("start");
 
     function practicalForSelectedChapter() {
-      const selected = chapter.value;
-      return selected === "all" ? window.PYTRAIN_REBALANCED_DATA.practical : window.PYTRAIN_REBALANCED_DATA.practical.filter((q) => q.chapter === selected);
+      return chapter.value === "all" ? window.PYTRAIN_REBALANCED_DATA.practical : window.PYTRAIN_REBALANCED_DATA.practical.filter((q) => q.chapter === chapter.value);
+    }
+
+    function selectedFilterValue(question) {
+      return chapter.value === "04" ? question.recipeSection : question.category;
     }
 
     function refillCategories() {
@@ -124,10 +134,14 @@
         chapter.value = "all";
         return;
       }
+
       const selectedCategory = category.value;
-      const categories = [...new Set(practicalForSelectedChapter().map((q) => q.category))].sort();
-      category.innerHTML = '<option value="all">すべて</option>' + categories.map((name) => `<option value="${name}">${name}</option>`).join("");
-      category.value = categories.includes(selectedCategory) ? selectedCategory : "all";
+      const questions = practicalForSelectedChapter();
+      const values = [...new Set(questions.map(selectedFilterValue).filter(Boolean))].sort();
+      const isChapter4 = chapter.value === "04";
+      categoryLabelElement.childNodes[0].nodeValue = isChapter4 ? "Python実践レシピ Chapter 4 の項目" : "カテゴリ";
+      category.innerHTML = '<option value="all">すべて</option>' + values.map((value) => `<option value="${value}">${isChapter4 ? chapter4Label[value] : value}</option>`).join("");
+      category.value = values.includes(selectedCategory) ? selectedCategory : "all";
     }
 
     level.addEventListener("change", () => setTimeout(refillCategories, 0));
@@ -140,7 +154,7 @@
 
       pool = activeBank().filter((q) => q.chapter === chapter.value);
       const selectedCategory = category.value;
-      if (selectedCategory !== "all") pool = pool.filter((q) => q.category === selectedCategory);
+      if (selectedCategory !== "all") pool = pool.filter((q) => selectedFilterValue(q) === selectedCategory);
       if (document.getElementById("unansweredOnly").checked) {
         const answeredIds = loadAnswered();
         pool = pool.filter((q) => !answeredIds.has(q.id));
