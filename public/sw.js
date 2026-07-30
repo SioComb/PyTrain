@@ -1,4 +1,4 @@
-const CACHE_NAME = "pytrain-pwa-v16";
+const CACHE_NAME = "pytrain-pwa-v17";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -8,6 +8,7 @@ const APP_SHELL = [
   "./data/practical-1.js",
   "./data/practical-2.js",
   "./data/scope-fix.js",
+  "./data/level-scope-audit.js",
   "./data/choice-display-fix.js",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
@@ -22,7 +23,11 @@ function repairIndexHtml(html) {
     .replace('id="rankDetail"', 'id="RankDetail"')
     .replace(
       '<script src="./data/scope-fix.js"></script>',
-      '<script src="./data/scope-fix.js"></script><script src="./data/choice-display-fix.js"></script>'
+      '<script src="./data/scope-fix.js"></script><script src="./data/level-scope-audit.js"></script><script src="./data/choice-display-fix.js"></script>'
+    )
+    .replace(
+      '<script src="./data/scope-fix.js"></script><script src="./data/choice-display-fix.js"></script>',
+      '<script src="./data/scope-fix.js"></script><script src="./data/level-scope-audit.js"></script><script src="./data/choice-display-fix.js"></script>'
     )
     .replace(
       'register("./sw.js",{scope:"./"})',
@@ -30,7 +35,7 @@ function repairIndexHtml(html) {
     )
     .replace(
       "ホーム画面アプリとして起動中です。",
-      "ホーム画面アプリとして起動中です（v16）。"
+      "ホーム画面アプリとして起動中です（v17）。"
     );
 }
 
