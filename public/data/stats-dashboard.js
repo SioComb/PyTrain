@@ -44,33 +44,36 @@
     }));
   }
 
-  function radarSvg(rows) {
-    const usable = [...rows].sort((a, b) => a.accuracy - b.accuracy || a.label.localeCompare(b.label, "ja")).slice(0, 12);
-    if (usable.length < 3) return '<div class="stats-empty">3項目以上あると、レーダーチャートを表示します。</div>';
-    const size = 420, cx = 210, cy = 210, radius = 142;
-    const point = (i, value) => {
-      const angle = -Math.PI / 2 + i * Math.PI * 2 / usable.length;
-      const r = radius * value / 100;
-      return [cx + Math.cos(angle) * r, cy + Math.sin(angle) * r];
-    };
-    const rings = [20, 40, 60, 80, 100].map((value) => {
-      const pts = usable.map((_, i) => point(i, value).join(",")).join(" ");
-      return `<polygon points="${pts}" fill="none" stroke="#475569" stroke-width="1" opacity=".65"/>`;
+  function horizontalBars(rows) {
+    if (!rows.length) return '<div class="stats-empty">表示できる項目がありません。</div>';
+    const maxAttempts = Math.max(1, ...rows.map((row) => row.attempts));
+    const items = rows.map((row) => {
+      const attemptsWidth = row.attempts / maxAttempts * 100;
+      const correctWidth = row.correct / maxAttempts * 100;
+      return `
+        <div class="stats-bar-item">
+          <div class="stats-bar-head">
+            <span class="stats-bar-label">${row.label}</span>
+            <span class="stats-bar-rate">正答率 ${row.accuracy}%</span>
+          </div>
+          <div class="stats-bar-line">
+            <span class="stats-bar-name">解答数</span>
+            <div class="stats-bar-track"><span class="stats-bar-fill stats-bar-attempts" style="width:${attemptsWidth}%"></span></div>
+            <strong class="stats-bar-value">${row.attempts}</strong>
+          </div>
+          <div class="stats-bar-line">
+            <span class="stats-bar-name">正解数</span>
+            <div class="stats-bar-track"><span class="stats-bar-fill stats-bar-correct" style="width:${correctWidth}%"></span></div>
+            <strong class="stats-bar-value">${row.correct}</strong>
+          </div>
+        </div>`;
     }).join("");
-    const axes = usable.map((_, i) => {
-      const [x, y] = point(i, 100);
-      return `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#475569" stroke-width="1"/>`;
-    }).join("");
-    const values = usable.map((r, i) => point(i, r.accuracy).join(",")).join(" ");
-    const labels = usable.map((r, i) => {
-      const angle = -Math.PI / 2 + i * Math.PI * 2 / usable.length;
-      const x = cx + Math.cos(angle) * (radius + 28);
-      const y = cy + Math.sin(angle) * (radius + 28);
-      const anchor = Math.cos(angle) > .25 ? "start" : Math.cos(angle) < -.25 ? "end" : "middle";
-      const label = r.label.length > 10 ? r.label.slice(0, 10) + "…" : r.label;
-      return `<text x="${x}" y="${y}" text-anchor="${anchor}" dominant-baseline="middle" fill="${r.measured ? "#cbd5e1" : "#64748b"}" font-size="11">${label} ${r.accuracy}%</text>`;
-    }).join("");
-    return `<svg class="stats-radar" viewBox="0 0 ${size} ${size}" role="img" aria-label="カテゴリ別正答率レーダーチャート">${rings}${axes}<polygon points="${values}" fill="rgba(56,189,248,.24)" stroke="#38bdf8" stroke-width="3"/>${labels}</svg>`;
+    return `
+      <div class="stats-bar-legend" aria-hidden="true">
+        <span><i class="stats-legend-attempts"></i>解答数</span>
+        <span><i class="stats-legend-correct"></i>正解数</span>
+      </div>
+      <div class="stats-bars" role="img" aria-label="項目別の解答数と正解数を比較する横棒グラフ">${items}</div>`;
   }
 
   function renderDashboard() {
@@ -81,7 +84,7 @@
       ? groupedResults((q) => q.level === "基礎" ? "基礎" : (window.PYTRAIN_CHAPTERS?.find((c) => c.value === q.chapter)?.label || `Chapter ${q.chapter}`))
       : groupedResults((q) => `${q.level}・${q.category || "未分類"}`);
     rows.sort((a, b) => a.accuracy - b.accuracy || a.label.localeCompare(b.label, "ja"));
-    document.getElementById("statsRadar").innerHTML = radarSvg(rows);
+    document.getElementById("statsBars").innerHTML = horizontalBars(rows);
     document.getElementById("statsRows").innerHTML = rows.map((r) => `
       <tr>
         <td>${r.label}</td>
@@ -107,10 +110,11 @@
       .stats-overlay{position:fixed;inset:0;z-index:1000;background:#020617;color:#f8fafc;overflow:auto;padding:max(16px,env(safe-area-inset-top)) 14px max(28px,env(safe-area-inset-bottom));}
       .stats-shell{max-width:900px;margin:auto}.stats-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}.stats-head h2{margin:0}
       .stats-controls{display:grid;grid-template-columns:1fr auto;gap:10px;margin-bottom:12px}.stats-panel{border:1px solid #334155;border-radius:14px;background:#111827;padding:14px;margin-bottom:14px}
-      .stats-radar{display:block;width:100%;max-width:520px;margin:auto}.stats-empty{padding:36px 12px;text-align:center;color:#cbd5e1}
+      .stats-empty{padding:36px 12px;text-align:center;color:#cbd5e1}.stats-bar-legend{display:flex;justify-content:flex-end;gap:16px;margin-bottom:14px;color:#cbd5e1;font-size:12px}.stats-bar-legend span{display:flex;align-items:center;gap:6px}.stats-bar-legend i{display:inline-block;width:18px;height:8px;border-radius:999px}.stats-legend-attempts,.stats-bar-attempts{background:#64748b}.stats-legend-correct,.stats-bar-correct{background:#38bdf8}
+      .stats-bars{display:grid;gap:16px}.stats-bar-item{border-bottom:1px solid #273449;padding-bottom:15px}.stats-bar-item:last-child{border-bottom:0;padding-bottom:0}.stats-bar-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px}.stats-bar-label{font-weight:700;overflow-wrap:anywhere}.stats-bar-rate{flex:none;color:#cbd5e1;font-size:12px}.stats-bar-line{display:grid;grid-template-columns:48px minmax(0,1fr) 30px;align-items:center;gap:8px;margin-top:6px}.stats-bar-name{color:#cbd5e1;font-size:12px}.stats-bar-track{height:10px;border-radius:999px;background:#1e293b;overflow:hidden}.stats-bar-fill{display:block;height:100%;min-width:0;border-radius:999px}.stats-bar-value{text-align:right;font-size:12px}
       .stats-table-wrap{overflow-x:auto}.stats-table{width:100%;border-collapse:collapse;font-size:13px}.stats-table th,.stats-table td{padding:10px 8px;border-bottom:1px solid #334155;text-align:right;white-space:nowrap}.stats-table th:first-child,.stats-table td:first-child{text-align:left;white-space:normal;min-width:180px}.stats-table th{color:#cbd5e1}.stats-weak{color:#fca5a5;font-weight:800}.stats-unmeasured{color:#94a3b8}
       #openStats{margin-top:10px}.stats-summary{color:#bae6fd;font-weight:700;margin:0 0 12px}
-      @media(max-width:520px){.stats-controls{grid-template-columns:1fr}.stats-overlay{padding-left:10px;padding-right:10px}.stats-panel{padding:10px}.stats-radar text{font-size:9px}}
+      @media(max-width:520px){.stats-controls{grid-template-columns:1fr}.stats-overlay{padding-left:10px;padding-right:10px}.stats-panel{padding:10px}.stats-bar-head{display:block}.stats-bar-rate{display:block;margin-top:3px}.stats-bar-line{grid-template-columns:44px minmax(0,1fr) 26px;gap:6px}}
     `;
     document.head.appendChild(style);
 
@@ -128,9 +132,9 @@
         <div class="stats-head"><h2>学習実績・弱点分析</h2><button id="closeStats" class="secondary" style="width:auto">閉じる</button></div>
         <div class="stats-controls"><label>集計単位<select id="statsMode"><option value="category">カテゴリ別</option><option value="chapter">章別</option></select></label></div>
         <p id="statsSummary" class="stats-summary"></p>
-        <div id="statsRadar" class="stats-panel"></div>
+        <div id="statsBars" class="stats-panel"></div>
         <div class="stats-panel stats-table-wrap"><table class="stats-table"><thead><tr><th>項目</th><th>回答済み</th><th>未回答</th><th>進捗</th><th>正答率</th></tr></thead><tbody id="statsRows"></tbody></table></div>
-        <p class="muted small">※未回答の項目は正答率0%として表示しますが、「もっとも弱い項目」の判定からは除外します。</p>
+        <p class="muted small">※横棒グラフの解答数・正解数は、再挑戦を含む累計回数です。未回答の項目は正答率0%として表示しますが、「もっとも弱い項目」の判定からは除外します。</p>
       </div>`;
     document.body.appendChild(overlay);
 
