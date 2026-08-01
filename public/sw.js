@@ -1,4 +1,4 @@
-const CACHE_NAME = "pytrain-pwa-v21";
+const CACHE_NAME = "pytrain-pwa-v22";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -8,6 +8,7 @@ const APP_SHELL = [
   "./data/practical-1.js",
   "./data/practical-2.js",
   "./data/scope-fix.js",
+  "./data/practical-only.js",
   "./data/level-scope-audit.js",
   "./data/choice-display-fix.js",
   "./data/stats-dashboard.js",
@@ -18,13 +19,13 @@ const APP_SHELL = [
 ];
 
 function repairIndexHtml(html) {
-  const scripts = '<script src="./data/scope-fix.js"></script><script src="./data/level-scope-audit.js"></script><script src="./data/choice-display-fix.js"></script><script src="./data/stats-dashboard.js"></script>';
+  const scripts = '<script src="./data/scope-fix.js"></script><script src="./data/practical-only.js"></script><script src="./data/level-scope-audit.js"></script><script src="./data/choice-display-fix.js"></script><script src="./data/stats-dashboard.js"></script>';
   return html
     .replace('id="rankSymbol"', 'id="RankSymbol"')
     .replace('id="rankTitle"', 'id="RankTitle"')
     .replace('id="rankDetail"', 'id="RankDetail"')
     .replace(
-      /<script src="\.\/data\/scope-fix\.js"><\/script>(?:<script src="\.\/data\/(?:level-scope-audit|choice-display-fix|stats-dashboard)\.js"><\/script>)*/,
+      /<script src="\.\/data\/scope-fix\.js"><\/script>(?:<script src="\.\/data\/(?:practical-only|level-scope-audit|choice-display-fix|stats-dashboard)\.js"><\/script>)*/,
       scripts
     )
     .replace(
@@ -33,7 +34,7 @@ function repairIndexHtml(html) {
     )
     .replace(
       /ホーム画面アプリとして起動中です(?:（v\d+）)?。/,
-      "ホーム画面アプリとして起動中です（v21）。"
+      "ホーム画面アプリとして起動中です（v22）。"
     );
 }
 
