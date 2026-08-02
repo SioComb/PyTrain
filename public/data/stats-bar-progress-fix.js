@@ -1,21 +1,76 @@
 (() => {
+  const HISTORY_KEY = "pytrain_question_stats_v1";
   let scheduled = false;
+
+  function loadStats() {
+    try {
+      return JSON.parse(localStorage.getItem(HISTORY_KEY) || "{}");
+    } catch {
+      return {};
+    }
+  }
+
+  function bankWithIds() {
+    const data = window.PYTRAIN_REBALANCED_DATA;
+    if (!data) return [];
+    return [
+      ...data.basic.map((q, i) => ({ ...q, id: `b${i}`, level: "基礎" })),
+      ...data.practical.map((q, i) => ({ ...q, id: `p${i}`, level: "実践" })),
+    ];
+  }
+
+  function chapterLabel(question) {
+    if (question.level === "基礎") return "基礎";
+    return window.PYTRAIN_CHAPTERS?.find((chapter) => chapter.value === question.chapter)?.label
+      || `Chapter ${question.chapter}`;
+  }
+
+  function buildProgressMap(mode) {
+    const stats = loadStats();
+    const groups = new Map();
+
+    bankWithIds().forEach((question) => {
+      const label = mode === "chapter"
+        ? chapterLabel(question)
+        : `${question.level}・${question.category || "未分類"}`;
+      if (!groups.has(label)) groups.set(label, { total: 0, answered: 0, attempts: 0, correct: 0 });
+
+      const group = groups.get(label);
+      group.total += 1;
+      const item = stats[question.id];
+      if (item?.attempts) {
+        group.answered += 1;
+        group.attempts += item.attempts;
+        group.correct += item.correct || 0;
+      }
+    });
+
+    const result = new Map();
+    groups.forEach((group, label) => {
+      const progress = group.total ? group.answered / group.total * 100 : 0;
+      const accuracy = group.attempts ? group.correct / group.attempts * 100 : 0;
+      result.set(label, {
+        progress: Math.max(0, Math.min(100, progress)),
+        correctProgress: Math.max(0, Math.min(100, progress * accuracy / 100)),
+      });
+    });
+    return result;
+  }
 
   function applyProgressWidths() {
     scheduled = false;
-    const bars = [...document.querySelectorAll("#statsBars .stats-bar-item")];
-    const rows = [...document.querySelectorAll("#statsRows tr")];
-    if (!bars.length || bars.length !== rows.length) return;
+    const mode = document.getElementById("statsMode")?.value || "chapter";
+    const progressMap = buildProgressMap(mode);
 
-    bars.forEach((bar, index) => {
-      const cells = rows[index].querySelectorAll("td");
-      if (cells.length < 5) return;
-      const progress = Math.max(0, Math.min(100, Number.parseFloat(cells[3].textContent) || 0));
-      const accuracy = Math.max(0, Math.min(100, Number.parseFloat(cells[4].textContent) || 0));
+    document.querySelectorAll("#statsBars .stats-bar-item").forEach((bar) => {
+      const label = bar.querySelector(".stats-bar-label")?.textContent?.trim();
+      const widths = label ? progressMap.get(label) : null;
+      if (!widths) return;
+
       const attemptsFill = bar.querySelector(".stats-bar-attempts");
       const correctFill = bar.querySelector(".stats-bar-correct");
-      if (attemptsFill) attemptsFill.style.width = `${progress}%`;
-      if (correctFill) correctFill.style.width = `${progress * accuracy / 100}%`;
+      if (attemptsFill) attemptsFill.style.width = `${widths.progress}%`;
+      if (correctFill) correctFill.style.width = `${widths.correctProgress}%`;
     });
   }
 
@@ -27,12 +82,12 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     const bars = document.getElementById("statsBars");
-    const rows = document.getElementById("statsRows");
-    if (!bars || !rows) return;
+    const mode = document.getElementById("statsMode");
+    if (!bars) return;
 
-    const observer = new MutationObserver(scheduleProgressUpdate);
-    observer.observe(bars, { childList: true, subtree: true });
-    observer.observe(rows, { childList: true, subtree: true });
+    new MutationObserver(scheduleProgressUpdate).observe(bars, { childList: true, subtree: true });
+    mode?.addEventListener("change", scheduleProgressUpdate);
+    document.getElementById("openStats")?.addEventListener("click", scheduleProgressUpdate);
     scheduleProgressUpdate();
   });
 })();
