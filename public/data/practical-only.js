@@ -36,6 +36,55 @@
   data.practical = [...data.practical, ...migratedBasic];
   data.basic = [];
 
+  const unpackingQuestions = [
+    {
+      q: "次のコードの実行後、`name` と `score` の値はどれ？\n\n`name, (math, score) = (\"Sora\", (80, 92))`",
+      choices: ["name='Sora', score=80", "name='Sora', score=92", "name=(80, 92), score='Sora'", "ValueErrorになる"],
+      answer: 1,
+      explanation: "ネストしたタプルは同じ入れ子構造でアンパックできます。`name` には `'Sora'`、`math` には `80`、`score` には `92` が入ります。",
+      category: "アンパック",
+      chapter: "03",
+      recipeSection: null,
+    },
+    {
+      q: "次のコードの実行後、`a`, `b`, `c` の値はどれ？\n\n`a, b, c = [10, 20, 30]`",
+      choices: ["a=10, b=20, c=30", "a=[10], b=[20], c=[30]", "a=30, b=20, c=10", "リストはアンパックできない"],
+      answer: 0,
+      explanation: "リストも反復可能オブジェクトなので、要素数と変数数が一致すれば順番にアンパックできます。",
+      category: "アンパック",
+      chapter: "03",
+      recipeSection: null,
+    },
+    {
+      q: "次のコードの実行後、`middle` の値はどれ？\n\n`first, *middle, last = [1, 2, 3, 4, 5]`",
+      choices: ["[2, 3, 4]", "(2, 3, 4)", "2", "[1, 2, 3, 4]"],
+      answer: 0,
+      explanation: "代入先の `*middle` は、先頭と末尾に割り当てられなかった残りの要素をリストとして受け取ります。",
+      category: "アンパック",
+      chapter: "03",
+      recipeSection: null,
+    },
+    {
+      q: "次のコードの出力はどれ？\n\n`def add(a, b):`\n`    return a + b`\n\n`values = [3, 7]`\n`print(add(*values))`",
+      choices: ["[3, 7]", "10", "37", "TypeErrorになる"],
+      answer: 1,
+      explanation: "関数呼び出しの `*values` は、リストの要素を位置引数として展開します。したがって `add(3, 7)` と同じです。",
+      category: "アンパック",
+      chapter: "03",
+      recipeSection: null,
+    },
+    {
+      q: "辞書からキーと値を同時に取り出して表示するコードとして正しいものはどれ？\n\n`scores = {\"A\": 80, \"B\": 90}`",
+      choices: ["`for key, value in scores.items(): print(key, value)`", "`for key, value in scores: print(key, value)`", "`for pair in scores.keys(), scores.values(): print(pair)`", "`for key = value in scores.items(): print(key, value)`"],
+      answer: 0,
+      explanation: "`dict.items()` は `(キー, 値)` のタプルを順に返します。`for key, value in scores.items()` では、そのタプルを各ループで2変数へアンパックしています。",
+      category: "アンパック",
+      chapter: "03",
+      recipeSection: null,
+    },
+  ];
+  data.practical.push(...unpackingQuestions);
+
   const blackQuestion = data.practical.find((question) => question.q === "Pythonコードフォーマッターとして有名なツールはどれ？");
   if (blackQuestion) {
     blackQuestion.q = "Blackでカレントディレクトリ以下のPythonコードを整形する基本コマンドはどれ？";
