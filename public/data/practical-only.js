@@ -36,6 +36,14 @@
   data.practical = [...data.practical, ...migratedBasic];
   data.basic = [];
 
+  const blackQuestion = data.practical.find((question) => question.q === "Pythonコードフォーマッターとして有名なツールはどれ？");
+  if (blackQuestion) {
+    blackQuestion.q = "Blackでカレントディレクトリ以下のPythonコードを整形する基本コマンドはどれ？";
+    blackQuestion.choices = ["black --check .", "black .", "black lint .", "python -m black --scan ."];
+    blackQuestion.answer = 1;
+    blackQuestion.explanation = "`black .` はカレントディレクトリ以下の対象ファイルをBlackで整形します。`black --check .` は変更せず、整形が必要かだけを確認します。";
+  }
+
   try {
     const statsKey = "pytrain_question_stats_v1";
     const stats = JSON.parse(localStorage.getItem(statsKey) || "{}");
