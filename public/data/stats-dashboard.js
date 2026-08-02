@@ -90,6 +90,11 @@
     tableButton?.setAttribute("aria-pressed", String(!showGraph));
   }
 
+  function chapterNumber(row) {
+    const match = /^Chapter\s+(\d+)\b/i.exec(row.label);
+    return match ? Number(match[1]) : Number.POSITIVE_INFINITY;
+  }
+
   function renderDashboard() {
     const overlay = document.getElementById("statsDashboard");
     if (!overlay) return;
@@ -97,7 +102,9 @@
     const rows = mode === "chapter"
       ? groupedResults((q) => q.level === "基礎" ? "基礎" : (window.PYTRAIN_CHAPTERS?.find((c) => c.value === q.chapter)?.label || `Chapter ${q.chapter}`))
       : groupedResults((q) => `${q.level}・${q.category || "未分類"}`);
-    rows.sort((a, b) => a.order - b.order);
+    rows.sort(mode === "chapter"
+      ? (a, b) => chapterNumber(a) - chapterNumber(b) || a.order - b.order
+      : (a, b) => a.order - b.order);
     document.getElementById("statsBars").innerHTML = horizontalBars(rows);
     document.getElementById("statsRows").innerHTML = rows.map((r) => `
       <tr>
@@ -154,7 +161,7 @@
         <p id="statsSummary" class="stats-summary"></p>
         <div id="statsGraphView"><div id="statsBars" class="stats-panel"></div></div>
         <div id="statsTableView" class="hidden"><div class="stats-panel stats-table-wrap"><table class="stats-table"><thead><tr><th>項目</th><th>回答済み</th><th>未回答</th><th>進捗</th><th>正答率</th></tr></thead><tbody id="statsRows"></tbody></table></div></div>
-        <p class="muted small">※表示順は問題データのチャプター順です。横棒グラフの解答数・正解数は、再挑戦を含む累計回数です。未回答の項目は正答率0%として表示しますが、「もっとも弱い項目」の判定からは除外します。</p>
+        <p class="muted small">※表示順はチャプター番号順です。横棒グラフの解答数・正解数は、再挑戦を含む累計回数です。未回答の項目は正答率0%として表示しますが、「もっとも弱い項目」の判定からは除外します。</p>
       </div>`;
     document.body.appendChild(overlay);
 
