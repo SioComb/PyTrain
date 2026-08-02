@@ -1,5 +1,6 @@
 (() => {
   const HISTORY_KEY = "pytrain_question_stats_v1";
+  const WRONG_KEY = "pytrain_wrong";
 
   function loadStats() {
     try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || "{}"); }
@@ -17,6 +18,23 @@
       ...data.basic.map((q, i) => ({ ...q, id: `b${i}`, level: "基礎" })),
       ...data.practical.map((q, i) => ({ ...q, id: `p${i}`, level: "実践" })),
     ];
+  }
+
+  function syncWrongReviewQueue() {
+    const stats = loadStats();
+    const reviewQuestions = bankWithIds().filter((q) => {
+      const item = stats[q.id];
+      if (!item?.attempts) return false;
+      if (typeof item.lastCorrect === "boolean") return !item.lastCorrect;
+      return (item.correct || 0) < item.attempts;
+    });
+    localStorage.setItem(WRONG_KEY, JSON.stringify(reviewQuestions));
+    const retryButton = document.getElementById("retryWrong");
+    if (retryButton) {
+      retryButton.disabled = reviewQuestions.length === 0;
+      retryButton.style.opacity = reviewQuestions.length ? "1" : ".45";
+    }
+    return reviewQuestions;
   }
 
   function groupedResults(groupBy) {
@@ -56,24 +74,11 @@
             <span class="stats-bar-label">${row.label}</span>
             <span class="stats-bar-rate">正答率 ${row.accuracy}%</span>
           </div>
-          <div class="stats-bar-line">
-            <span class="stats-bar-name">解答数</span>
-            <div class="stats-bar-track"><span class="stats-bar-fill stats-bar-attempts" style="width:${attemptsWidth}%"></span></div>
-            <strong class="stats-bar-value">${row.attempts}</strong>
-          </div>
-          <div class="stats-bar-line">
-            <span class="stats-bar-name">正解数</span>
-            <div class="stats-bar-track"><span class="stats-bar-fill stats-bar-correct" style="width:${correctWidth}%"></span></div>
-            <strong class="stats-bar-value">${row.correct}</strong>
-          </div>
+          <div class="stats-bar-line"><span class="stats-bar-name">解答数</span><div class="stats-bar-track"><span class="stats-bar-fill stats-bar-attempts" style="width:${attemptsWidth}%"></span></div><strong class="stats-bar-value">${row.attempts}</strong></div>
+          <div class="stats-bar-line"><span class="stats-bar-name">正解数</span><div class="stats-bar-track"><span class="stats-bar-fill stats-bar-correct" style="width:${correctWidth}%"></span></div><strong class="stats-bar-value">${row.correct}</strong></div>
         </div>`;
     }).join("");
-    return `
-      <div class="stats-bar-legend" aria-hidden="true">
-        <span><i class="stats-legend-attempts"></i>解答数</span>
-        <span><i class="stats-legend-correct"></i>正解数</span>
-      </div>
-      <div class="stats-bars" role="img" aria-label="項目別の解答数と正解数を比較する横棒グラフ">${items}</div>`;
+    return `<div class="stats-bar-legend" aria-hidden="true"><span><i class="stats-legend-attempts"></i>解答数</span><span><i class="stats-legend-correct"></i>正解数</span></div><div class="stats-bars" role="img" aria-label="項目別の解答数と正解数を比較する横棒グラフ">${items}</div>`;
   }
 
   function setView(view) {
@@ -90,11 +95,6 @@
     tableButton?.setAttribute("aria-pressed", String(!showGraph));
   }
 
-  function chapterNumber(row) {
-    const match = /^Chapter\s+(\d+)\b/i.exec(row.label);
-    return match ? Number(match[1]) : Number.POSITIVE_INFINITY;
-  }
-
   function renderDashboard() {
     const overlay = document.getElementById("statsDashboard");
     if (!overlay) return;
@@ -102,29 +102,27 @@
     const rows = mode === "chapter"
       ? groupedResults((q) => q.level === "基礎" ? "基礎" : (window.PYTRAIN_CHAPTERS?.find((c) => c.value === q.chapter)?.label || `Chapter ${q.chapter}`))
       : groupedResults((q) => `${q.level}・${q.category || "未分類"}`);
-    rows.sort(mode === "chapter"
-      ? (a, b) => chapterNumber(a) - chapterNumber(b) || a.order - b.order
-      : (a, b) => a.order - b.order);
+    rows.sort((a, b) => {
+      if (mode !== "chapter") return a.order - b.order;
+      const chapterNumber = (row) => Number((/^Chapter\s+(\d+)/.exec(row.label) || [])[1]);
+      const aNumber = chapterNumber(a), bNumber = chapterNumber(b);
+      if (Number.isFinite(aNumber) && Number.isFinite(bNumber)) return aNumber - bNumber;
+      if (Number.isFinite(aNumber)) return -1;
+      if (Number.isFinite(bNumber)) return 1;
+      return a.order - b.order;
+    });
     document.getElementById("statsBars").innerHTML = horizontalBars(rows);
-    document.getElementById("statsRows").innerHTML = rows.map((r) => `
-      <tr>
-        <td>${r.label}</td>
-        <td>${r.answered}/${r.total}</td>
-        <td>${r.remaining}</td>
-        <td>${r.progress}%</td>
-        <td class="${r.measured ? (r.accuracy < 60 ? "stats-weak" : "") : "stats-unmeasured"}">${r.accuracy}%</td>
-      </tr>`).join("");
+    document.getElementById("statsRows").innerHTML = rows.map((r) => `<tr><td>${r.label}</td><td>${r.answered}/${r.total}</td><td>${r.remaining}</td><td>${r.progress}%</td><td class="${r.measured ? (r.accuracy < 60 ? "stats-weak" : "") : "stats-unmeasured"}">${r.accuracy}%</td></tr>`).join("");
     const measured = rows.filter((r) => r.measured);
     const weak = [...measured].sort((a, b) => a.accuracy - b.accuracy || a.order - b.order)[0];
-    document.getElementById("statsSummary").textContent = weak
-      ? `現在もっとも弱い項目: ${weak.label}（正答率 ${weak.accuracy}%）`
-      : "まだ回答履歴がないため、弱点は未判定です。";
+    document.getElementById("statsSummary").textContent = weak ? `現在もっとも弱い項目: ${weak.label}（正答率 ${weak.accuracy}%）` : "まだ回答履歴がないため、弱点は未判定です。";
   }
 
   document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("progressTable")?.remove();
     const record = document.getElementById("record");
     if (!record || document.getElementById("openStats")) return;
+    syncWrongReviewQueue();
 
     const style = document.createElement("style");
     style.textContent = `
@@ -148,21 +146,7 @@
     const overlay = document.createElement("section");
     overlay.id = "statsDashboard";
     overlay.className = "stats-overlay hidden";
-    overlay.innerHTML = `
-      <div class="stats-shell">
-        <div class="stats-head"><h2>学習実績・弱点分析</h2><button id="closeStats" class="secondary" style="width:auto">閉じる</button></div>
-        <div class="stats-controls">
-          <label>集計単位<select id="statsMode"><option value="category">カテゴリ別</option><option value="chapter">章別</option></select></label>
-          <div class="stats-view-switch" role="group" aria-label="実績の表示形式">
-            <button id="showStatsGraph" type="button" class="active" aria-pressed="true">グラフ</button>
-            <button id="showStatsTable" type="button" aria-pressed="false">表形式</button>
-          </div>
-        </div>
-        <p id="statsSummary" class="stats-summary"></p>
-        <div id="statsGraphView"><div id="statsBars" class="stats-panel"></div></div>
-        <div id="statsTableView" class="hidden"><div class="stats-panel stats-table-wrap"><table class="stats-table"><thead><tr><th>項目</th><th>回答済み</th><th>未回答</th><th>進捗</th><th>正答率</th></tr></thead><tbody id="statsRows"></tbody></table></div></div>
-        <p class="muted small">※表示順はチャプター番号順です。横棒グラフの解答数・正解数は、再挑戦を含む累計回数です。未回答の項目は正答率0%として表示しますが、「もっとも弱い項目」の判定からは除外します。</p>
-      </div>`;
+    overlay.innerHTML = `<div class="stats-shell"><div class="stats-head"><h2>学習実績・弱点分析</h2><button id="closeStats" class="secondary" style="width:auto">閉じる</button></div><div class="stats-controls"><label>集計単位<select id="statsMode"><option value="category">カテゴリ別</option><option value="chapter">章別</option></select></label><div class="stats-view-switch" role="group" aria-label="実績の表示形式"><button id="showStatsGraph" type="button" class="active" aria-pressed="true">グラフ</button><button id="showStatsTable" type="button" aria-pressed="false">表形式</button></div></div><p id="statsSummary" class="stats-summary"></p><div id="statsGraphView"><div id="statsBars" class="stats-panel"></div></div><div id="statsTableView" class="hidden"><div class="stats-panel stats-table-wrap"><table class="stats-table"><thead><tr><th>項目</th><th>回答済み</th><th>未回答</th><th>進捗</th><th>正答率</th></tr></thead><tbody id="statsRows"></tbody></table></div></div><p class="muted small">※章別はチャプター番号順です。横棒グラフの解答数・正解数は、再挑戦を含む累計回数です。未回答の項目は正答率0%として表示しますが、「もっとも弱い項目」の判定からは除外します。</p></div>`;
     document.body.appendChild(overlay);
 
     button.addEventListener("click", () => { overlay.classList.remove("hidden"); renderDashboard(); });
@@ -179,10 +163,21 @@
           const isCorrect = choice === displayedAnswer;
           const stats = loadStats();
           const previous = stats[q.id] || { attempts: 0, correct: 0 };
-          stats[q.id] = { attempts: previous.attempts + 1, correct: previous.correct + (isCorrect ? 1 : 0) };
+          stats[q.id] = { attempts: previous.attempts + 1, correct: previous.correct + (isCorrect ? 1 : 0), lastCorrect: isCorrect };
           saveStats(stats);
         }
-        return originalAnswer(choice);
+        const result = originalAnswer(choice);
+        syncWrongReviewQueue();
+        return result;
+      };
+    }
+
+    const originalFinish = window.finish;
+    if (typeof originalFinish === "function") {
+      window.finish = function() {
+        const result = originalFinish();
+        syncWrongReviewQueue();
+        return result;
       };
     }
   });
