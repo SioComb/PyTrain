@@ -33,25 +33,27 @@
       const label = mode === "chapter"
         ? chapterLabel(question)
         : `${question.level}・${question.category || "未分類"}`;
-      if (!groups.has(label)) groups.set(label, { total: 0, answered: 0, attempts: 0, correct: 0 });
+      if (!groups.has(label)) groups.set(label, { total: 0, answered: 0, latestCorrect: 0 });
 
       const group = groups.get(label);
       group.total += 1;
       const item = stats[question.id];
-      if (item?.attempts) {
-        group.answered += 1;
-        group.attempts += item.attempts;
-        group.correct += item.correct || 0;
-      }
+      if (!item?.attempts) return;
+
+      group.answered += 1;
+      const isLatestCorrect = typeof item.lastCorrect === "boolean"
+        ? item.lastCorrect
+        : (item.correct || 0) === item.attempts;
+      if (isLatestCorrect) group.latestCorrect += 1;
     });
 
     const result = new Map();
     groups.forEach((group, label) => {
-      const progress = group.total ? group.answered / group.total * 100 : 0;
-      const accuracy = group.attempts ? group.correct / group.attempts * 100 : 0;
+      const answeredProgress = group.total ? group.answered / group.total * 100 : 0;
+      const correctProgress = group.total ? group.latestCorrect / group.total * 100 : 0;
       result.set(label, {
-        progress: Math.max(0, Math.min(100, progress)),
-        correctProgress: Math.max(0, Math.min(100, progress * accuracy / 100)),
+        answeredProgress: Math.max(0, Math.min(100, answeredProgress)),
+        correctProgress: Math.max(0, Math.min(100, correctProgress)),
       });
     });
     return result;
@@ -69,7 +71,7 @@
 
       const attemptsFill = bar.querySelector(".stats-bar-attempts");
       const correctFill = bar.querySelector(".stats-bar-correct");
-      if (attemptsFill) attemptsFill.style.width = `${widths.progress}%`;
+      if (attemptsFill) attemptsFill.style.width = `${widths.answeredProgress}%`;
       if (correctFill) correctFill.style.width = `${widths.correctProgress}%`;
     });
   }
