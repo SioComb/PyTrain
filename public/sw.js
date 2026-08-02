@@ -1,4 +1,4 @@
-const CACHE_NAME = "pytrain-pwa-v28";
+const CACHE_NAME = "pytrain-pwa-v29";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -13,6 +13,7 @@ const APP_SHELL = [
   "./data/choice-display-fix.js",
   "./data/stats-dashboard.js",
   "./data/stats-bar-progress-fix.js",
+  "./data/stats-default-chapter.js",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
   "./icons/icon-maskable-512.png",
@@ -20,13 +21,13 @@ const APP_SHELL = [
 ];
 
 function repairIndexHtml(html) {
-  const scripts = '<script src="./data/scope-fix.js"></script><script src="./data/practical-only.js"></script><script src="./data/level-scope-audit.js"></script><script src="./data/choice-display-fix.js"></script><script src="./data/stats-dashboard.js"></script><script src="./data/stats-bar-progress-fix.js"></script>';
+  const scripts = '<script src="./data/scope-fix.js"></script><script src="./data/practical-only.js"></script><script src="./data/level-scope-audit.js"></script><script src="./data/choice-display-fix.js"></script><script src="./data/stats-dashboard.js"></script><script src="./data/stats-bar-progress-fix.js"></script><script src="./data/stats-default-chapter.js"></script>';
   return html
     .replace('id="rankSymbol"', 'id="RankSymbol"')
     .replace('id="rankTitle"', 'id="RankTitle"')
     .replace('id="rankDetail"', 'id="RankDetail"')
     .replace(
-      /<script src="\.\/data\/scope-fix\.js"><\/script>(?:<script src="\.\/data\/(?:practical-only|level-scope-audit|choice-display-fix|stats-dashboard|stats-bar-progress-fix)\.js"><\/script>)*/,
+      /<script src="\.\/data\/scope-fix\.js"><\/script>(?:<script src="\.\/data\/(?:practical-only|level-scope-audit|choice-display-fix|stats-dashboard|stats-bar-progress-fix|stats-default-chapter)\.js"><\/script>)*/,
       scripts
     )
     .replace(
@@ -35,7 +36,7 @@ function repairIndexHtml(html) {
     )
     .replace(
       /ホーム画面アプリとして起動中です(?:（v\d+）)?。/,
-      "ホーム画面アプリとして起動中です（v28）。"
+      "ホーム画面アプリとして起動中です（v29）。"
     );
 }
 
