@@ -1,5 +1,8 @@
 (() => {
+  let scheduled = false;
+
   function applyProgressWidths() {
+    scheduled = false;
     const bars = [...document.querySelectorAll("#statsBars .stats-bar-item")];
     const rows = [...document.querySelectorAll("#statsRows tr")];
     if (!bars.length || bars.length !== rows.length) return;
@@ -16,10 +19,20 @@
     });
   }
 
+  function scheduleProgressUpdate() {
+    if (scheduled) return;
+    scheduled = true;
+    requestAnimationFrame(applyProgressWidths);
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     const bars = document.getElementById("statsBars");
-    if (!bars) return;
-    new MutationObserver(applyProgressWidths).observe(bars, { childList: true, subtree: true });
-    applyProgressWidths();
+    const rows = document.getElementById("statsRows");
+    if (!bars || !rows) return;
+
+    const observer = new MutationObserver(scheduleProgressUpdate);
+    observer.observe(bars, { childList: true, subtree: true });
+    observer.observe(rows, { childList: true, subtree: true });
+    scheduleProgressUpdate();
   });
 })();
