@@ -1,4 +1,4 @@
-const CACHE_NAME = "pytrain-pwa-v25";
+const CACHE_NAME = "pytrain-pwa-v26";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -34,7 +34,7 @@ function repairIndexHtml(html) {
     )
     .replace(
       /ホーム画面アプリとして起動中です(?:（v\d+）)?。/,
-      "ホーム画面アプリとして起動中です（v25）。"
+      "ホーム画面アプリとして起動中です（v26）。"
     );
 }
 
