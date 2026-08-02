@@ -7,9 +7,9 @@
     if (question.chapter) return question.chapter;
     const text = `${question.category || ""} ${question.q || ""} ${question.explanation || ""}`.toLowerCase();
     if (includesAny(text,["pip","venv","仮想環境","パッケージ管理"," uv","`uv","uv ","pyproject","wheel"])) return "01";
-    if (includesAny(text,["pep 8","ruff","black","flake8","静的解析","コーディング規約","スタイルガイド"])) return "02";
+    if (includesAny(text,["mypy","型ヒント","typing","typealias","newtype","protocol","callable","literal","annotated","optional["])) return "05";
+    if (includesAny(text,["pep 8","ruff","black","flake8","静的解析","コーディング規約","スタイルガイド","フォーマッター","リンター"])) return "02";
     if (includesAny(text,["dataclass","namedtuple","__getattr__","__getattribute__","__setattr__","__getitem__","__len__","__bool__","__eq__","__hash__","weakref","id(","type(","isinstance","issubclass","help(","dir(","クラス","継承","メソッド","属性"])) return "04";
-    if (includesAny(text,["mypy","型ヒント","typing","typealias","newtype","protocol","callable","literal","annotated"])) return "05";
     if (includesAny(text,["unicodedata","正規表現","re.","regex","f-string","文字列","string.","str.","bytes","encode","decode"])) return "06";
     if (includesAny(text,["decimal","statistics","random","math.","数値計算","擬似乱数","統計","演算子","int","float","complex","bool("])) return "07";
     if (includesAny(text,["datetime","zoneinfo","dateutil","time.","タイムゾーン","日付","時刻"])) return "08";
@@ -23,7 +23,7 @@
     if (includesAny(text,["doctest","unittest","pytest","mock","テスト","テストケース"])) return "16";
     if (includesAny(text,["breakpoint","pdb","timeit","traceback","logging","デバッグ","スタックトレース","ログ"])) return "17";
     if (includesAny(text,["secrets","hashlib","cryptography","ハッシュ","暗号","安全な乱数"])) return "18";
-    if (includesAny(text,["asyncio","concurrent.futures","subprocess","マルチプロセス","マルチスレッド","非同期","並行処理","並列処理"])) return "19";
+    if (includesAny(text,["asyncio","concurrent.futures","threading","multiprocessing","subprocess","イベントループ","マルチプロセス","マルチスレッド","非同期","並行処理","並列処理","サブプロセス"])) return "19";
     return "03";
   }
 
