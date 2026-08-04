@@ -1,5 +1,6 @@
 (() => {
   const byId = (id) => document.getElementById(id);
+  let updateQueued = false;
 
   function selectedValue(...ids) {
     for (const id of ids) {
@@ -44,15 +45,25 @@
 
     const requested = count.value === "all" ? questions.length : Number(count.value);
     const actual = Math.min(Number.isFinite(requested) ? requested : 0, questions.length);
+    const label = unansweredOnly.checked
+      ? `未回答 ${actual}問を開始（残り${questions.length}問）`
+      : `${actual}問を開始`;
+    const disabled = actual === 0;
+    const opacity = disabled ? ".45" : "1";
 
-    if (unansweredOnly.checked) {
-      start.textContent = `未回答 ${actual}問を開始（残り${questions.length}問）`;
-    } else {
-      start.textContent = `${actual}問を開始`;
-    }
+    // 同じ値を再代入するとMutationObserverが再発火するため、変更時だけ更新する。
+    if (start.textContent !== label) start.textContent = label;
+    if (start.disabled !== disabled) start.disabled = disabled;
+    if (start.style.opacity !== opacity) start.style.opacity = opacity;
+  }
 
-    start.disabled = actual === 0;
-    start.style.opacity = actual === 0 ? ".45" : "1";
+  function scheduleUpdate() {
+    if (updateQueued) return;
+    updateQueued = true;
+    queueMicrotask(() => {
+      updateQueued = false;
+      bindControls();
+    });
   }
 
   function bind(element) {
@@ -79,11 +90,15 @@
 
   document.addEventListener("DOMContentLoaded", bindControls);
 
-  const observer = new MutationObserver(() => bindControls());
+  // UI部品が後から追加された場合だけ再同期する。文字列更新は監視しない。
+  const observer = new MutationObserver((mutations) => {
+    const hasAddedElement = mutations.some((mutation) =>
+      [...mutation.addedNodes].some((node) => node.nodeType === Node.ELEMENT_NODE)
+    );
+    if (hasAddedElement) scheduleUpdate();
+  });
   observer.observe(document.documentElement, {
     childList: true,
     subtree: true,
-    attributes: true,
-    attributeFilter: ["class"],
   });
 })();
