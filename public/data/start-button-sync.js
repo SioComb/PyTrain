@@ -1,4 +1,13 @@
 (() => {
+  // Issue #6/#7 の問題データを、既存の DATA 参照を壊さず同期的に追加する。
+  // index.html や既存UIスクリプトの読み込み順は変更しない。
+  if (!window.__pytrainIssues67Loaded && window.PYTRAIN_REBALANCED_DATA) {
+    window.__pytrainIssues67Loaded = true;
+    window.__pytrainStableData = window.PYTRAIN_REBALANCED_DATA;
+    document.write('<script src="./data/issues-6-7.js"><\/script>');
+    document.write('<script>(function(){var stable=window.__pytrainStableData;var expanded=window.PYTRAIN_REBALANCED_DATA;if(stable&&expanded&&stable!==expanded){stable.basic=expanded.basic;stable.practical=expanded.practical;window.PYTRAIN_REBALANCED_DATA=stable;}delete window.__pytrainStableData;})();<\/script>');
+  }
+
   const byId = (id) => document.getElementById(id);
   let updateQueued = false;
 
@@ -51,7 +60,6 @@
     const disabled = actual === 0;
     const opacity = disabled ? ".45" : "1";
 
-    // 同じ値を再代入するとMutationObserverが再発火するため、変更時だけ更新する。
     if (start.textContent !== label) start.textContent = label;
     if (start.disabled !== disabled) start.disabled = disabled;
     if (start.style.opacity !== opacity) start.style.opacity = opacity;
@@ -90,7 +98,6 @@
 
   document.addEventListener("DOMContentLoaded", bindControls);
 
-  // UI部品が後から追加された場合だけ再同期する。文字列更新は監視しない。
   const observer = new MutationObserver((mutations) => {
     const hasAddedElement = mutations.some((mutation) =>
       [...mutation.addedNodes].some((node) => node.nodeType === Node.ELEMENT_NODE)
