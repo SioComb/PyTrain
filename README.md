@@ -36,13 +36,15 @@ npm run serve
 PyTrain/
 ├─ public/
 │  ├─ index.html
+│  ├─ bootstrap.js
+│  ├─ app.js
 │  ├─ manifest.webmanifest
 │  ├─ sw.js
 │  ├─ data/
-│  │  ├─ basic-1.js
-│  │  ├─ basic-2.js
-│  │  ├─ practical-1.js
-│  │  ├─ practical-2.js
+│  │  ├─ basic-1.json
+│  │  ├─ basic-2.json
+│  │  ├─ practical-1.json
+│  │  ├─ practical-2.json
 │  │  ├─ scope-fix.js
 │  │  ├─ practical-only.js
 │  │  ├─ level-scope-audit.js
@@ -60,19 +62,19 @@ PyTrain/
 └─ LICENSE
 ```
 
-`basic-1.js` と `basic-2.js` は、旧基礎問題を読み込んで実践バンクへ統合するための内部データとして残しています。画面上の基礎モードは廃止済みです。
+`basic-1.json` と `basic-2.json` は、旧基礎問題を読み込んで実践バンクへ統合するための内部データとして残しています。画面上の基礎モードは廃止済みです。
 
 ## 問題データ
 
 問題は次の形式で管理します。
 
-```javascript
+```json
 {
-  q: "問題文",
-  choices: ["選択肢A", "選択肢B", "選択肢C", "選択肢D"],
-  answer: 0,
-  explanation: "解説",
-  category: "カテゴリ名"
+  "q": "問題文",
+  "choices": ["選択肢A", "選択肢B", "選択肢C", "選択肢D"],
+  "answer": 0,
+  "explanation": "解説",
+  "category": "カテゴリ名"
 }
 ```
 

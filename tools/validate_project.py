@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import re
 import sys
 from collections import Counter
 from pathlib import Path
@@ -17,27 +16,26 @@ def check(condition: bool, message: str) -> None:
         ERRORS.append(message)
 
 
-def load_js_array(path: Path, variable_name: str) -> list[dict]:
+def load_json_array(path: Path) -> list[dict]:
     if not path.exists():
         ERRORS.append(f"不足ファイル: {path.relative_to(ROOT)}")
         return []
 
-    text = path.read_text(encoding="utf-8")
-    pattern = rf"window\.{re.escape(variable_name)}\s*=\s*(\[.*\]);\s*$"
-    match = re.search(pattern, text, flags=re.S)
-    if not match:
-        ERRORS.append(f"問題データを抽出できません: {path.relative_to(ROOT)}")
-        return []
-
     try:
-        return json.loads(match.group(1))
+        data = json.loads(path.read_text(encoding="utf-8"))
     except json.JSONDecodeError as exc:
         ERRORS.append(f"JSON形式が不正です: {path.relative_to(ROOT)} ({exc})")
         return []
+    if not isinstance(data, list):
+        ERRORS.append(f"問題データが配列ではありません: {path.relative_to(ROOT)}")
+        return []
+    return data
 
 
 required = [
     PUBLIC / "index.html",
+    PUBLIC / "bootstrap.js",
+    PUBLIC / "app.js",
     PUBLIC / "manifest.webmanifest",
     PUBLIC / "sw.js",
     PUBLIC / "icons" / "icon-192.png",
@@ -49,10 +47,10 @@ for path in required:
     check(path.exists(), f"不足ファイル: {path.relative_to(ROOT)}")
 
 parts = {
-    "basic-1": load_js_array(DATA_DIR / "basic-1.js", "PYTRAIN_BASIC_1"),
-    "basic-2": load_js_array(DATA_DIR / "basic-2.js", "PYTRAIN_BASIC_2"),
-    "practical-1": load_js_array(DATA_DIR / "practical-1.js", "PYTRAIN_PRACTICAL_1"),
-    "practical-2": load_js_array(DATA_DIR / "practical-2.js", "PYTRAIN_PRACTICAL_2"),
+    "basic-1": load_json_array(DATA_DIR / "basic-1.json"),
+    "basic-2": load_json_array(DATA_DIR / "basic-2.json"),
+    "practical-1": load_json_array(DATA_DIR / "practical-1.json"),
+    "practical-2": load_json_array(DATA_DIR / "practical-2.json"),
 }
 
 for part_name, questions in parts.items():
@@ -89,11 +87,15 @@ for bank_name, questions in banks.items():
 check(len(set(all_question_texts)) == len(all_question_texts), "基礎・実践をまたぐ重複問題があります")
 
 html = (PUBLIC / "index.html").read_text(encoding="utf-8")
-for filename in ("basic-1.js", "basic-2.js", "practical-1.js", "practical-2.js"):
-    check(f"./data/{filename}" in html, f"index.htmlに{filename}の参照がありません")
+check("./bootstrap.js" in html, "index.htmlにbootstrap.jsの参照がありません")
 
-check("window.confirm" in html, "解答中にメニューへ戻る確認処理がありません")
-check("現在の解答状況は保存されません" in html, "確認メッセージの文言がありません")
+bootstrap = (PUBLIC / "bootstrap.js").read_text(encoding="utf-8")
+app = (PUBLIC / "app.js").read_text(encoding="utf-8")
+for filename in ("basic-1.json", "basic-2.json", "practical-1.json", "practical-2.json"):
+    check(f"./data/{filename}" in bootstrap, f"bootstrap.jsに{filename}の参照がありません")
+
+check("window.confirm" in app, "解答中にメニューへ戻る確認処理がありません")
+check("現在の解答状況は保存されません" in app, "確認メッセージの文言がありません")
 check("serviceWorker.register" in html, "Service Worker登録処理がありません")
 check("manifest.webmanifest" in html, "manifestリンクがありません")
 check("OFFLINE 400問" in html, "400問表示へ更新されていません")
@@ -105,7 +107,7 @@ for icon in manifest.get("icons", []):
     check(path.exists(), f"manifest参照アイコンがありません: {icon['src']}")
 
 sw = (PUBLIC / "sw.js").read_text(encoding="utf-8")
-for filename in ("basic-1.js", "basic-2.js", "practical-1.js", "practical-2.js"):
+for filename in ("basic-1.json", "basic-2.json", "practical-1.json", "practical-2.json"):
     check(f"./data/{filename}" in sw, f"Service Workerのキャッシュ対象に{filename}がありません")
 
 if ERRORS:
