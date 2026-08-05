@@ -1,0 +1,1202 @@
+[
+  {
+    "q": "抽象メソッドを示すデコレータはどれ？",
+    "choices": [
+      "@abstractmethod",
+      "@abstract",
+      "@interface",
+      "@virtual"
+    ],
+    "answer": 0,
+    "explanation": "`abc.abstractmethod` を使います。",
+    "category": "クラス"
+  },
+  {
+    "q": "データクラスを生成するデコレータはどれ？",
+    "choices": [
+      "@data",
+      "@record",
+      "@struct",
+      "@dataclass"
+    ],
+    "answer": 3,
+    "explanation": "`dataclasses.dataclass` が特殊メソッドを生成します。",
+    "category": "データクラス"
+  },
+  {
+    "q": "dataclassで比較対象から除外するフィールド指定はどれ？",
+    "choices": [
+      "field(eq=None)",
+      "field(skip_compare=True)",
+      "field(compare=False)",
+      "field(ignore=True)"
+    ],
+    "answer": 2,
+    "explanation": "`compare=False` で比較・順序付けから除外します。",
+    "category": "データクラス"
+  },
+  {
+    "q": "dataclassで可変デフォルト値を安全に作る指定はどれ？",
+    "choices": [
+      "factory=[]",
+      "field(default_factory=list)",
+      "field(default=[])",
+      "default(list()) shared"
+    ],
+    "answer": 1,
+    "explanation": "`default_factory` はインスタンスごとに新しい値を作ります。",
+    "category": "データクラス"
+  },
+  {
+    "q": "dataclassをイミュータブル風にするオプションはどれ？",
+    "choices": [
+      "frozen=True",
+      "immutable=True",
+      "readonly=True",
+      "const=True"
+    ],
+    "answer": 0,
+    "explanation": "`@dataclass(frozen=True)` は属性代入を制限します。",
+    "category": "データクラス"
+  },
+  {
+    "q": "名前付きタプルを作る標準的な仕組みはどれ？",
+    "choices": [
+      "tuple.named",
+      "types.record",
+      "dataclasses.tuple",
+      "collections.namedtuple"
+    ],
+    "answer": 3,
+    "explanation": "`namedtuple` はフィールド名付きタプル型を生成します。",
+    "category": "クラス"
+  },
+  {
+    "q": "属性アクセスをカスタマイズし、通常の探索後に呼ばれるメソッドはどれ？",
+    "choices": [
+      "__getitem__",
+      "__lookup__",
+      "__getattr__",
+      "__getattribute__"
+    ],
+    "answer": 2,
+    "explanation": "`__getattr__` は通常の属性探索に失敗した場合に呼ばれます。",
+    "category": "クラス"
+  },
+  {
+    "q": "すべての属性アクセスを横取りするメソッドはどれ？",
+    "choices": [
+      "__access__",
+      "__getattribute__",
+      "__getattr__",
+      "__getitem__"
+    ],
+    "answer": 1,
+    "explanation": "`__getattribute__` は常に呼ばれるため再帰に注意します。",
+    "category": "クラス"
+  },
+  {
+    "q": "属性代入をカスタマイズする特殊メソッドはどれ？",
+    "choices": [
+      "__setattr__",
+      "__setitem__",
+      "__assign__",
+      "__putattr__"
+    ],
+    "answer": 0,
+    "explanation": "`obj.name = value` で呼ばれます。",
+    "category": "クラス"
+  },
+  {
+    "q": "添字アクセス `obj[key]` を実装するメソッドはどれ？",
+    "choices": [
+      "__getattr__",
+      "__index__",
+      "__lookup__",
+      "__getitem__"
+    ],
+    "answer": 3,
+    "explanation": "`__getitem__` はマッピングやシーケンス風アクセスを実装します。",
+    "category": "クラス"
+  },
+  {
+    "q": "`len(obj)` に対応する特殊メソッドはどれ？",
+    "choices": [
+      "__count__",
+      "length",
+      "__len__",
+      "__size__"
+    ],
+    "answer": 2,
+    "explanation": "`len` は `__len__` を呼びます。",
+    "category": "クラス"
+  },
+  {
+    "q": "真偽値評価をカスタマイズする特殊メソッドはどれ？",
+    "choices": [
+      "__boolean__",
+      "__bool__",
+      "__truth__",
+      "__if__"
+    ],
+    "answer": 1,
+    "explanation": "`__bool__` がなければ `__len__` が参照される場合があります。",
+    "category": "クラス"
+  },
+  {
+    "q": "等価比較 `==` に対応する特殊メソッドはどれ？",
+    "choices": [
+      "__eq__",
+      "__is__",
+      "__cmp_only__",
+      "__equal__"
+    ],
+    "answer": 0,
+    "explanation": "`__eq__` が等価比較を実装します。",
+    "category": "クラス"
+  },
+  {
+    "q": "ハッシュ可能なオブジェクトに必要な特殊メソッドはどれ？",
+    "choices": [
+      "__digest__",
+      "__key__",
+      "hash",
+      "__hash__"
+    ],
+    "answer": 3,
+    "explanation": "`hash(obj)` は `__hash__` を使います。",
+    "category": "クラス"
+  },
+  {
+    "q": "弱参照を提供する標準モジュールはどれ？",
+    "choices": [
+      "references",
+      "gc.ref",
+      "weakref",
+      "weak"
+    ],
+    "answer": 2,
+    "explanation": "`weakref` は参照先の寿命を延ばさない参照を提供します。",
+    "category": "クラス"
+  },
+  {
+    "q": "型注釈の標準化を扱うPEPはどれ？",
+    "choices": [
+      "PEP 20",
+      "PEP 484",
+      "PEP 8",
+      "PEP 257"
+    ],
+    "answer": 1,
+    "explanation": "PEP 484は型ヒントを規定します。",
+    "category": "タイプヒント"
+  },
+  {
+    "q": "戻り値型を注釈する記号はどれ？",
+    "choices": [
+      "->",
+      "=>",
+      ":=",
+      "::"
+    ],
+    "answer": 0,
+    "explanation": "`def f() -> int:` のように使います。",
+    "category": "タイプヒント"
+  },
+  {
+    "q": "値が `int` または `None` である型を表すものはどれ？",
+    "choices": [
+      "int & None",
+      "Optional[int, None]",
+      "Maybe int",
+      "int | None"
+    ],
+    "answer": 3,
+    "explanation": "Python 3.10以降はPEP 604の `|` を使えます。",
+    "category": "タイプヒント"
+  },
+  {
+    "q": "任意の型を表すtypingの型はどれ？",
+    "choices": [
+      "Unknown",
+      "Whatever",
+      "Any",
+      "object_only always same"
+    ],
+    "answer": 2,
+    "explanation": "`typing.Any` は型検査を緩めます。",
+    "category": "タイプヒント"
+  },
+  {
+    "q": "呼び出し可能オブジェクトの型を表すものはどれ？",
+    "choices": [
+      "Invokable",
+      "Callable",
+      "FunctionOnly",
+      "Lambda"
+    ],
+    "answer": 1,
+    "explanation": "`typing.Callable[[引数型...], 戻り値型]` と記述できます。",
+    "category": "タイプヒント"
+  },
+  {
+    "q": "反復可能オブジェクトの型を表すものはどれ？",
+    "choices": [
+      "Iterable",
+      "IteratorOnly",
+      "Sequence always",
+      "Loopable"
+    ],
+    "answer": 0,
+    "explanation": "`collections.abc.Iterable` などを使います。",
+    "category": "タイプヒント"
+  },
+  {
+    "q": "イテレータの型を表すものはどれ？",
+    "choices": [
+      "Iterable only",
+      "GeneratorOnly always",
+      "Nextable",
+      "Iterator"
+    ],
+    "answer": 3,
+    "explanation": "`Iterator[T]` は `__next__` を持つ反復子を表します。",
+    "category": "タイプヒント"
+  },
+  {
+    "q": "ジェネレータのyield・send・return型を表せるものはどれ？",
+    "choices": [
+      "Coroutine only",
+      "Iterator3",
+      "Generator",
+      "Yield"
+    ],
+    "answer": 2,
+    "explanation": "`Generator[YieldType, SendType, ReturnType]` を使います。",
+    "category": "タイプヒント"
+  },
+  {
+    "q": "固定された文字列候補を型として表すものはどれ？",
+    "choices": [
+      "Fixed",
+      "Literal",
+      "EnumOnly",
+      "Const"
+    ],
+    "answer": 1,
+    "explanation": "`Literal['r', 'w']` のように値を限定します。",
+    "category": "タイプヒント"
+  },
+  {
+    "q": "ユーザー定義の型別名を明示する仕組みはどれ？",
+    "choices": [
+      "TypeAlias",
+      "AliasType only",
+      "typedef",
+      "NewType only same"
+    ],
+    "answer": 0,
+    "explanation": "`TypeAlias` や新しい `type` 文で型別名を表せます。",
+    "category": "タイプヒント"
+  },
+  {
+    "q": "意味的に異なる新しい静的型を作るtyping関数はどれ？",
+    "choices": [
+      "TypeAlias",
+      "cast",
+      "Annotated",
+      "NewType"
+    ],
+    "answer": 3,
+    "explanation": "`NewType` は型検査上別の型として扱います。",
+    "category": "タイプヒント"
+  },
+  {
+    "q": "型チェッカーへ型を明示的に伝える関数はどれ？",
+    "choices": [
+      "coerce",
+      "as_type",
+      "cast",
+      "convert"
+    ],
+    "answer": 2,
+    "explanation": "`typing.cast` は実行時変換を行わず型検査へ情報を与えます。",
+    "category": "タイプヒント"
+  },
+  {
+    "q": "追加メタデータを型へ付加するものはどれ？",
+    "choices": [
+      "TaggedOnly",
+      "Annotated",
+      "Decorated",
+      "MetadataType"
+    ],
+    "answer": 1,
+    "explanation": "`Annotated[T, metadata]` を使います。",
+    "category": "タイプヒント"
+  },
+  {
+    "q": "構造的サブタイピングを表すtypingの基底はどれ？",
+    "choices": [
+      "Protocol",
+      "Interface",
+      "ABCOnly",
+      "DuckType"
+    ],
+    "answer": 0,
+    "explanation": "`Protocol` は必要な属性・メソッド構造で適合を判定します。",
+    "category": "タイプヒント"
+  },
+  {
+    "q": "実行時にProtocolで `isinstance` 判定可能にするデコレータはどれ？",
+    "choices": [
+      "@check_runtime",
+      "@protocol_runtime",
+      "@isinstanceable",
+      "@runtime_checkable"
+    ],
+    "answer": 3,
+    "explanation": "`typing.runtime_checkable` を付けます。",
+    "category": "タイプヒント"
+  },
+  {
+    "q": "正規表現パターンを事前コンパイルする関数はどれ？",
+    "choices": [
+      "re.pattern",
+      "regex.compile_only",
+      "re.compile",
+      "re.build"
+    ],
+    "answer": 2,
+    "explanation": "`re.compile` はPatternオブジェクトを返します。",
+    "category": "テキスト処理"
+  },
+  {
+    "q": "文字列先頭から正規表現を照合する関数はどれ？",
+    "choices": [
+      "re.finditer",
+      "re.match",
+      "re.search",
+      "re.fullmatch"
+    ],
+    "answer": 1,
+    "explanation": "`re.match` は先頭位置から照合します。",
+    "category": "テキスト処理"
+  },
+  {
+    "q": "文字列全体がパターンに一致するか調べる関数はどれ？",
+    "choices": [
+      "re.fullmatch",
+      "re.match",
+      "re.search",
+      "re.complete"
+    ],
+    "answer": 0,
+    "explanation": "`fullmatch` は文字列全体の一致を要求します。",
+    "category": "テキスト処理"
+  },
+  {
+    "q": "文字列中のどこかで最初の一致を探す関数はどれ？",
+    "choices": [
+      "re.match",
+      "re.fullmatch",
+      "re.scan",
+      "re.search"
+    ],
+    "answer": 3,
+    "explanation": "`search` は先頭に限定しません。",
+    "category": "テキスト処理"
+  },
+  {
+    "q": "一致箇所をイテレータで列挙する関数はどれ？",
+    "choices": [
+      "re.iterfind",
+      "re.matches",
+      "re.finditer",
+      "re.findall_only"
+    ],
+    "answer": 2,
+    "explanation": "`finditer` はMatchオブジェクトのイテレータを返します。",
+    "category": "テキスト処理"
+  },
+  {
+    "q": "正規表現で置換する関数はどれ？",
+    "choices": [
+      "re.change",
+      "re.sub",
+      "re.replace",
+      "re.swap"
+    ],
+    "answer": 1,
+    "explanation": "`re.sub(pattern, repl, text)` を使います。",
+    "category": "テキスト処理"
+  },
+  {
+    "q": "正規表現の特殊文字をリテラルとして扱うためエスケープする関数はどれ？",
+    "choices": [
+      "re.escape",
+      "str.escape",
+      "re.quote_only",
+      "regex.literal"
+    ],
+    "answer": 0,
+    "explanation": "`re.escape` はパターン用に特殊文字をエスケープします。",
+    "category": "テキスト処理"
+  },
+  {
+    "q": "複数行モードを指定するフラグはどれ？",
+    "choices": [
+      "re.DOTALL",
+      "re.ASCII",
+      "re.VERBOSE",
+      "re.MULTILINE"
+    ],
+    "answer": 3,
+    "explanation": "`^` と `$` が各行の先頭・末尾にも一致します。",
+    "category": "テキスト処理"
+  },
+  {
+    "q": "ドットを改行にも一致させるフラグはどれ？",
+    "choices": [
+      "re.IGNORECASE",
+      "re.LOCALE",
+      "re.DOTALL",
+      "re.MULTILINE"
+    ],
+    "answer": 2,
+    "explanation": "`DOTALL` で `.` が改行にも一致します。",
+    "category": "テキスト処理"
+  },
+  {
+    "q": "大文字小文字を区別しないフラグはどれ？",
+    "choices": [
+      "re.VERBOSE",
+      "re.IGNORECASE",
+      "re.NOCASE_ONLY",
+      "re.ASCII"
+    ],
+    "answer": 1,
+    "explanation": "`IGNORECASE` または `I` を使います。",
+    "category": "テキスト処理"
+  },
+  {
+    "q": "Unicode正規化を行う標準モジュールはどれ？",
+    "choices": [
+      "unicodedata",
+      "unicode",
+      "textnorm",
+      "codecs.normalize"
+    ],
+    "answer": 0,
+    "explanation": "`unicodedata.normalize` を使います。",
+    "category": "テキスト処理"
+  },
+  {
+    "q": "文字コード変換のエラーハンドラ `errors='replace'` の動作はどれ？",
+    "choices": [
+      "必ず例外を送出する",
+      "該当部分を削除せず停止する",
+      "自動で別エンコーディングへ切り替える",
+      "変換できない部分を代替文字へ置き換える"
+    ],
+    "answer": 3,
+    "explanation": "`replace` は置換文字を使用します。",
+    "category": "テキスト処理"
+  },
+  {
+    "q": "`errors='ignore'` の注意点はどれ？",
+    "choices": [
+      "速度が常に低下するだけ",
+      "ASCII専用になる",
+      "変換不能データが黙って失われ得る",
+      "必ず完全復元できる"
+    ],
+    "answer": 2,
+    "explanation": "データ欠落に気づきにくいため慎重に使います。",
+    "category": "テキスト処理"
+  },
+  {
+    "q": "文字列テンプレートを提供する標準クラスはどれ？",
+    "choices": [
+      "text.Template",
+      "string.Template",
+      "str.Template",
+      "template.String"
+    ],
+    "answer": 1,
+    "explanation": "`string.Template` は `$name` 形式の置換を提供します。",
+    "category": "テキスト処理"
+  },
+  {
+    "q": "テキストを行単位に分割し改行保持も選べるメソッドはどれ？",
+    "choices": [
+      "splitlines",
+      "splitrows",
+      "lines",
+      "partition_lines"
+    ],
+    "answer": 0,
+    "explanation": "`str.splitlines(keepends=True)` で改行保持も可能です。",
+    "category": "テキスト処理"
+  },
+  {
+    "q": "文字列を3部分に分けるメソッドはどれ？",
+    "choices": [
+      "split3",
+      "divide",
+      "tripart",
+      "partition"
+    ],
+    "answer": 3,
+    "explanation": "`partition(sep)` は前・区切り・後のタプルを返します。",
+    "category": "テキスト処理"
+  },
+  {
+    "q": "右側から3部分に分けるメソッドはどれ？",
+    "choices": [
+      "rsplit3",
+      "right_partition_only",
+      "rpartition",
+      "partition_right"
+    ],
+    "answer": 2,
+    "explanation": "`rpartition` は最後の区切りで分割します。",
+    "category": "テキスト処理"
+  },
+  {
+    "q": "パスワードなど秘密値の比較でタイミング攻撃を緩和する関数はどれ？",
+    "choices": [
+      "secrets.equals",
+      "hmac.compare_digest",
+      "str.secure_compare",
+      "hashlib.equal"
+    ],
+    "answer": 1,
+    "explanation": "`compare_digest` は内容依存の時間差を減らす比較です。",
+    "category": "テキスト処理"
+  },
+  {
+    "q": "バイナリデータをBase64へ変換する標準モジュールはどれ？",
+    "choices": [
+      "base64",
+      "binascii_only",
+      "codec64",
+      "binarytext"
+    ],
+    "answer": 0,
+    "explanation": "`base64` はエンコード・デコード関数を提供します。",
+    "category": "テキスト処理"
+  },
+  {
+    "q": "テキストを折り返す標準モジュールはどれ？",
+    "choices": [
+      "wraptext",
+      "string.wrap",
+      "formatlines",
+      "textwrap"
+    ],
+    "answer": 3,
+    "explanation": "`textwrap` は幅指定の折り返し等を提供します。",
+    "category": "テキスト処理"
+  },
+  {
+    "q": "タイムゾーン情報を持たないdatetimeを何と呼ぶ？",
+    "choices": [
+      "UTC datetimeのみ",
+      "local-fixed datetime",
+      "naive datetime",
+      "aware datetime"
+    ],
+    "answer": 2,
+    "explanation": "tzinfoを持たないdatetimeはnaiveです。",
+    "category": "日付と時刻"
+  },
+  {
+    "q": "タイムゾーン情報を持つdatetimeを何と呼ぶ？",
+    "choices": [
+      "zoned string",
+      "aware datetime",
+      "naive datetime",
+      "absolute date only"
+    ],
+    "answer": 1,
+    "explanation": "有効なtzinfoを持つdatetimeはawareです。",
+    "category": "日付と時刻"
+  },
+  {
+    "q": "現在のUTC日時をawareで得る代表的な方法はどれ？",
+    "choices": [
+      "datetime.now(timezone.utc)",
+      "datetime.utcnow() only aware",
+      "date.today(timezone.utc)",
+      "time.utc_now()"
+    ],
+    "answer": 0,
+    "explanation": "`timezone.utc` を渡すとUTCのaware datetimeになります。",
+    "category": "日付と時刻"
+  },
+  {
+    "q": "日時差を表す型はどれ？",
+    "choices": [
+      "duration only",
+      "timespan",
+      "interval",
+      "timedelta"
+    ],
+    "answer": 3,
+    "explanation": "`datetime.timedelta` は日数・秒・マイクロ秒等を表します。",
+    "category": "日付と時刻"
+  },
+  {
+    "q": "文字列をdatetimeへ解析するメソッドはどれ？",
+    "choices": [
+      "date.parse",
+      "time.strptime_only returns datetime",
+      "datetime.strptime",
+      "datetime.strftime"
+    ],
+    "answer": 2,
+    "explanation": "`strptime` は書式に従って文字列を解析します。",
+    "category": "日付と時刻"
+  },
+  {
+    "q": "datetimeを文字列へ整形するメソッドはどれ？",
+    "choices": [
+      "date.render",
+      "datetime.strftime",
+      "datetime.strptime",
+      "datetime.format_only"
+    ],
+    "answer": 1,
+    "explanation": "`strftime` は書式文字列で表示を作ります。",
+    "category": "日付と時刻"
+  },
+  {
+    "q": "ISO 8601文字列からdatetimeを作るメソッドはどれ？",
+    "choices": [
+      "datetime.fromisoformat",
+      "datetime.iso_parse",
+      "datetime.fromstr",
+      "dateutil.parse only"
+    ],
+    "answer": 0,
+    "explanation": "`fromisoformat` は対応するISO形式を解析します。",
+    "category": "日付と時刻"
+  },
+  {
+    "q": "両端へ高速に追加・削除できるコンテナはどれ？",
+    "choices": [
+      "list only always O(1) at front",
+      "tuple",
+      "array.array only",
+      "collections.deque"
+    ],
+    "answer": 3,
+    "explanation": "`deque` は両端キューです。",
+    "category": "データ型とアルゴリズム"
+  },
+  {
+    "q": "要素数を数える辞書サブクラスはどれ？",
+    "choices": [
+      "dict.counter",
+      "statistics.Counter",
+      "collections.Counter",
+      "collections.CountMap"
+    ],
+    "answer": 2,
+    "explanation": "`Counter` はハッシュ可能要素の個数を管理します。",
+    "category": "データ型とアルゴリズム"
+  },
+  {
+    "q": "存在しないキーへ既定値を生成する辞書サブクラスはどれ？",
+    "choices": [
+      "mapping.factory",
+      "collections.defaultdict",
+      "dict.default",
+      "collections.autodict"
+    ],
+    "answer": 1,
+    "explanation": "`defaultdict` はdefault_factoryを呼びます。",
+    "category": "データ型とアルゴリズム"
+  },
+  {
+    "q": "辞書風アクセスを重ねる読み取りビューはどれ？",
+    "choices": [
+      "collections.ChainMap",
+      "collections.MapChain",
+      "dict.chain",
+      "itertools.mapping"
+    ],
+    "answer": 0,
+    "explanation": "`ChainMap` は複数マッピングを1つのビューとして扱います。",
+    "category": "データ型とアルゴリズム"
+  },
+  {
+    "q": "最小ヒープを提供する標準モジュールはどれ？",
+    "choices": [
+      "priorityq",
+      "minheap",
+      "queue.heap",
+      "heapq"
+    ],
+    "answer": 3,
+    "explanation": "`heapq` はリストを最小ヒープとして扱います。",
+    "category": "データ型とアルゴリズム"
+  },
+  {
+    "q": "ヒープへ要素を追加する関数はどれ？",
+    "choices": [
+      "heapq.insert",
+      "heapq.add",
+      "heapq.heappush",
+      "heapq.push"
+    ],
+    "answer": 2,
+    "explanation": "`heappush` はヒープ不変条件を保ちます。",
+    "category": "データ型とアルゴリズム"
+  },
+  {
+    "q": "ヒープから最小要素を取り出す関数はどれ？",
+    "choices": [
+      "heapq.take",
+      "heapq.heappop",
+      "heapq.pop",
+      "heapq.minpop"
+    ],
+    "answer": 1,
+    "explanation": "`heappop` は最小要素を削除して返します。",
+    "category": "データ型とアルゴリズム"
+  },
+  {
+    "q": "直積を生成するitertools関数はどれ？",
+    "choices": [
+      "itertools.product",
+      "itertools.permutations",
+      "itertools.combinations",
+      "itertools.chain"
+    ],
+    "answer": 0,
+    "explanation": "`product` はデカルト積を生成します。",
+    "category": "データ型とアルゴリズム"
+  },
+  {
+    "q": "順列を生成するitertools関数はどれ？",
+    "choices": [
+      "itertools.product",
+      "itertools.combinations",
+      "itertools.repeat",
+      "itertools.permutations"
+    ],
+    "answer": 3,
+    "explanation": "`permutations` は順序を区別します。",
+    "category": "データ型とアルゴリズム"
+  },
+  {
+    "q": "組合せを生成するitertools関数はどれ？",
+    "choices": [
+      "itertools.product",
+      "itertools.arrangements",
+      "itertools.combinations",
+      "itertools.permutations"
+    ],
+    "answer": 2,
+    "explanation": "`combinations` は順序を区別しません。",
+    "category": "データ型とアルゴリズム"
+  },
+  {
+    "q": "複数iterableを連結して反復するitertools関数はどれ？",
+    "choices": [
+      "itertools.product",
+      "itertools.chain",
+      "itertools.merge",
+      "itertools.concat"
+    ],
+    "answer": 1,
+    "explanation": "`chain` は順番に要素を返します。",
+    "category": "データ型とアルゴリズム"
+  },
+  {
+    "q": "関数の一部引数を固定するfunctools関数はどれ？",
+    "choices": [
+      "functools.partial",
+      "functools.wraps",
+      "functools.reduce",
+      "functools.bind_only"
+    ],
+    "answer": 0,
+    "explanation": "`partial` は部分適用した呼び出し可能オブジェクトを返します。",
+    "category": "データ型とアルゴリズム"
+  },
+  {
+    "q": "関数結果をキャッシュするデコレータはどれ？",
+    "choices": [
+      "functools.cache_clear",
+      "functools.memo_only",
+      "functools.cached_property only",
+      "functools.lru_cache"
+    ],
+    "answer": 3,
+    "explanation": "`lru_cache` は引数ごとの結果をキャッシュします。",
+    "category": "データ型とアルゴリズム"
+  },
+  {
+    "q": "パス結合を `/` 演算子で行えるクラスはどれ？",
+    "choices": [
+      "files.Path",
+      "sys.Path",
+      "pathlib.Path",
+      "os.path.Path"
+    ],
+    "answer": 2,
+    "explanation": "`Path('a') / 'b'` のように使えます。",
+    "category": "ファイルとOS"
+  },
+  {
+    "q": "ファイル内容を文字列として読むPathメソッドはどれ？",
+    "choices": [
+      "open_text_only",
+      "read_text",
+      "read_string",
+      "load_text"
+    ],
+    "answer": 1,
+    "explanation": "`Path.read_text()` は開いて読み閉じる処理をまとめます。",
+    "category": "ファイルとOS"
+  },
+  {
+    "q": "ファイルへ文字列を書き込むPathメソッドはどれ？",
+    "choices": [
+      "write_text",
+      "write_string",
+      "save_text",
+      "put_text"
+    ],
+    "answer": 0,
+    "explanation": "`Path.write_text()` を使います。",
+    "category": "ファイルとOS"
+  },
+  {
+    "q": "ディレクトリを親ごと作成し、既存でも失敗させない指定はどれ？",
+    "choices": [
+      "mkdir(recursive='yes')",
+      "makedirs(ignore=True only)",
+      "create_tree(force=True)",
+      "mkdir(parents=True, exist_ok=True)"
+    ],
+    "answer": 3,
+    "explanation": "`parents` と `exist_ok` を指定します。",
+    "category": "ファイルとOS"
+  },
+  {
+    "q": "外部コマンドを実行する標準モジュールはどれ？",
+    "choices": [
+      "commands_only",
+      "os.execsafe",
+      "subprocess",
+      "process"
+    ],
+    "answer": 2,
+    "explanation": "`subprocess.run` 等を使います。",
+    "category": "ファイルとOS"
+  },
+  {
+    "q": "コマンド失敗時に例外を送出させる `subprocess.run` 引数はどれ？",
+    "choices": [
+      "error_on_status=True",
+      "check=True",
+      "raise=True",
+      "strict=True"
+    ],
+    "answer": 1,
+    "explanation": "非0終了コードで `CalledProcessError` になります。",
+    "category": "ファイルとOS"
+  },
+  {
+    "q": "標準出力を文字列として受け取る代表的な指定はどれ？",
+    "choices": [
+      "capture_output=True, text=True",
+      "stdout='string'",
+      "return_text=True only",
+      "pipe='decode'"
+    ],
+    "answer": 0,
+    "explanation": "出力をPIPEへ接続しテキストとしてデコードします。",
+    "category": "ファイルとOS"
+  },
+  {
+    "q": "ディレクトリツリーをコピーするshutil関数はどれ？",
+    "choices": [
+      "shutil.copydir",
+      "os.copytree",
+      "pathlib.clone",
+      "shutil.copytree"
+    ],
+    "answer": 3,
+    "explanation": "`copytree` はディレクトリを再帰コピーします。",
+    "category": "ファイルとOS"
+  },
+  {
+    "q": "JSON文字列をPythonオブジェクトへ変換する関数はどれ？",
+    "choices": [
+      "json.decode_only",
+      "json.parse",
+      "json.loads",
+      "json.load only string"
+    ],
+    "answer": 2,
+    "explanation": "`loads` のsはstringを表します。",
+    "category": "データ形式"
+  },
+  {
+    "q": "ファイルからJSONを読み込む関数はどれ？",
+    "choices": [
+      "json.open",
+      "json.load",
+      "json.loads",
+      "json.read"
+    ],
+    "answer": 1,
+    "explanation": "`load` はファイルオブジェクトから読みます。",
+    "category": "データ形式"
+  },
+  {
+    "q": "PythonオブジェクトをJSON文字列へ変換する関数はどれ？",
+    "choices": [
+      "json.dumps",
+      "json.dump only string",
+      "json.encode_only",
+      "json.stringify"
+    ],
+    "answer": 0,
+    "explanation": "`dumps` は文字列を返します。",
+    "category": "データ形式"
+  },
+  {
+    "q": "CSVを辞書として読み込むクラスはどれ？",
+    "choices": [
+      "csv.MapReader",
+      "csv.ReaderDict",
+      "csv.TableReader",
+      "csv.DictReader"
+    ],
+    "answer": 3,
+    "explanation": "ヘッダーをキーとして各行を辞書化します。",
+    "category": "データ形式"
+  },
+  {
+    "q": "URLを扱う標準パッケージはどれ？",
+    "choices": [
+      "httpx",
+      "urltools",
+      "urllib",
+      "requests"
+    ],
+    "answer": 2,
+    "explanation": "`urllib` は標準ライブラリです。",
+    "category": "インターネット"
+  },
+  {
+    "q": "URLクエリ文字列を構築する関数はどれ？",
+    "choices": [
+      "http.urlencode",
+      "urllib.parse.urlencode",
+      "urllib.query.build",
+      "url.encode_params"
+    ],
+    "answer": 1,
+    "explanation": "`urlencode` はマッピング等をクエリ文字列へ変換します。",
+    "category": "インターネット"
+  },
+  {
+    "q": "URLを各構成要素へ分解する関数はどれ？",
+    "choices": [
+      "urllib.parse.urlparse",
+      "urllib.parse.splitall",
+      "url.parts",
+      "http.parse_url only"
+    ],
+    "answer": 0,
+    "explanation": "`urlparse` はscheme、netloc、path等を返します。",
+    "category": "インターネット"
+  },
+  {
+    "q": "unittestのテストケース基底クラスはどれ？",
+    "choices": [
+      "unittest.Case",
+      "unittest.Test",
+      "testing.TestCase",
+      "unittest.TestCase"
+    ],
+    "answer": 3,
+    "explanation": "`TestCase` を継承してテストメソッドを定義します。",
+    "category": "テスト"
+  },
+  {
+    "q": "unittestで等価性を検証するメソッドはどれ？",
+    "choices": [
+      "assertSameValue",
+      "checkEqual",
+      "assertEqual",
+      "assertEqualsOnly deprecated"
+    ],
+    "answer": 2,
+    "explanation": "`self.assertEqual(actual, expected)` を使います。",
+    "category": "テスト"
+  },
+  {
+    "q": "指定例外が発生することを検証するメソッドはどれ？",
+    "choices": [
+      "raises only pytest",
+      "assertRaises",
+      "expectException",
+      "assertThrows"
+    ],
+    "answer": 1,
+    "explanation": "`assertRaises` はコンテキストマネージャとしても使えます。",
+    "category": "テスト"
+  },
+  {
+    "q": "一時的に属性や関数を置き換えるmock機能はどれ？",
+    "choices": [
+      "unittest.mock.patch",
+      "unittest.mock.replace_only",
+      "mock.swap",
+      "unittest.stub"
+    ],
+    "answer": 0,
+    "explanation": "`patch` は対象をテスト中だけ差し替えます。",
+    "category": "テスト"
+  },
+  {
+    "q": "mock呼び出し回数を検証するメソッドはどれ？",
+    "choices": [
+      "assert_once_called",
+      "called_once",
+      "verify_count_one",
+      "assert_called_once"
+    ],
+    "answer": 3,
+    "explanation": "`Mock.assert_called_once()` を使います。",
+    "category": "テスト"
+  },
+  {
+    "q": "テスト前に毎回実行されるTestCaseメソッドはどれ？",
+    "choices": [
+      "setup_test",
+      "prepare",
+      "setUp",
+      "beforeEach"
+    ],
+    "answer": 2,
+    "explanation": "`setUp` は各テストメソッドの前に呼ばれます。",
+    "category": "テスト"
+  },
+  {
+    "q": "テスト後に毎回実行されるTestCaseメソッドはどれ？",
+    "choices": [
+      "finish",
+      "tearDown",
+      "afterEach",
+      "cleanup_test"
+    ],
+    "answer": 1,
+    "explanation": "`tearDown` は各テストメソッドの後に呼ばれます。",
+    "category": "テスト"
+  },
+  {
+    "q": "デバッガを起動する標準モジュールはどれ？",
+    "choices": [
+      "pdb",
+      "debug",
+      "breakpoint_module",
+      "trace only"
+    ],
+    "answer": 0,
+    "explanation": "`pdb` は対話的デバッガです。",
+    "category": "デバッグ"
+  },
+  {
+    "q": "コード中でデバッガへ入る組み込み関数はどれ？",
+    "choices": [
+      "debug()",
+      "pdb()",
+      "stop_here()",
+      "breakpoint()"
+    ],
+    "answer": 3,
+    "explanation": "`breakpoint()` は既定で `pdb.set_trace()` 相当です。",
+    "category": "デバッグ"
+  },
+  {
+    "q": "例外情報をログへスタックトレース付きで出すloggingメソッドはどれ？",
+    "choices": [
+      "logger.traceback",
+      "logger.raise",
+      "logger.exception",
+      "logger.error_only always trace"
+    ],
+    "answer": 2,
+    "explanation": "`exception` は例外処理中に `exc_info=True` 相当で記録します。",
+    "category": "デバッグ"
+  },
+  {
+    "q": "ログレベルの一般的な重大度順で最も高いものはどれ？",
+    "choices": [
+      "WARNING",
+      "CRITICAL",
+      "DEBUG",
+      "INFO"
+    ],
+    "answer": 1,
+    "explanation": "標準レベルではCRITICALが最も重大です。",
+    "category": "デバッグ"
+  },
+  {
+    "q": "暗号学的に安全な乱数用途の標準モジュールはどれ？",
+    "choices": [
+      "secrets",
+      "random",
+      "math.random",
+      "uuid only always"
+    ],
+    "answer": 0,
+    "explanation": "`secrets` はトークンやパスワード生成向けです。",
+    "category": "暗号・セキュリティ"
+  },
+  {
+    "q": "URL安全なランダムトークンを作る関数はどれ？",
+    "choices": [
+      "random.url_token",
+      "hashlib.random_url",
+      "uuid.token",
+      "secrets.token_urlsafe"
+    ],
+    "answer": 3,
+    "explanation": "`token_urlsafe` はBase64 URL-safe文字列を返します。",
+    "category": "暗号・セキュリティ"
+  },
+  {
+    "q": "パスワード保存で単純なSHA-256一回だけが不適切な主な理由はどれ？",
+    "choices": [
+      "Pythonで利用できない",
+      "必ず同じパスワードでも異なる値になる",
+      "高速すぎて総当たり攻撃に弱く、ソルトやストレッチングが不足する",
+      "SHA-256は文字列を扱えない"
+    ],
+    "answer": 2,
+    "explanation": "専用のKDFをソルト付きで使うべきです。",
+    "category": "暗号・セキュリティ"
+  },
+  {
+    "q": "ユーザー入力をシェル文字列へ連結して実行する危険はどれ？",
+    "choices": [
+      "MRO破壊",
+      "コマンドインジェクション",
+      "型ヒント消失",
+      "GIL解除"
+    ],
+    "answer": 1,
+    "explanation": "可能なら引数リストを使い `shell=False` を維持します。",
+    "category": "暗号・セキュリティ"
+  }
+]
